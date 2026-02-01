@@ -10,6 +10,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const toggleDebugEl = document.getElementById("toggleDebug");
   const messageLimitEl = document.getElementById("messageLimit");
   const refreshBtn = document.getElementById("refreshBtn");
+  const themeModeEl = document.getElementById("themeMode");
 
   // Storage keys
   const SETTINGS_KEY = "csb_settings";
@@ -40,13 +41,29 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   /**
+   * Apply theme class to the document root.
+   */
+  function applyTheme(theme) {
+    const root = document.documentElement;
+    root.classList.remove("theme-light", "theme-dark", "theme-system");
+    if (theme === "dark") {
+      root.classList.add("theme-dark");
+    } else if (theme === "light") {
+      root.classList.add("theme-light");
+    } else {
+      root.classList.add("theme-system");
+    }
+  }
+
+  /**
    * Save settings to storage and sync to localStorage for page-script.
    */
   function saveSettings() {
     const settings = {
       enabled: toggleEnabledEl.checked,
       messageLimit: parseInt(messageLimitEl.value, 10) || 10,
-      debug: toggleDebugEl.checked
+      debug: toggleDebugEl.checked,
+      theme: themeModeEl.value
     };
 
     chrome.storage.sync.set({ [SETTINGS_KEY]: settings });
@@ -73,12 +90,16 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // Load initial settings from storage
-  chrome.storage.sync.get({ [SETTINGS_KEY]: { enabled: true, messageLimit: 15, debug: false } }, (data) => {
+  chrome.storage.sync.get(
+    { [SETTINGS_KEY]: { enabled: true, messageLimit: 15, debug: false, theme: "system" } },
+    (data) => {
     const settings = data[SETTINGS_KEY];
     toggleEnabledEl.checked = settings.enabled;
     messageLimitEl.value = settings.messageLimit;
     toggleDebugEl.checked = settings.debug;
+    themeModeEl.value = settings.theme || "system";
     updateStatusText(settings.enabled);
+    applyTheme(themeModeEl.value);
   });
 
   // Handle enabled toggle change
@@ -99,6 +120,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Handle debug toggle change
   toggleDebugEl.addEventListener("change", () => {
+    saveSettings();
+  });
+
+  // Handle theme change
+  themeModeEl.addEventListener("change", () => {
+    applyTheme(themeModeEl.value);
     saveSettings();
   });
 

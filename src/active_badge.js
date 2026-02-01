@@ -73,7 +73,7 @@
       fontSize: "14px",
       fontWeight: "500",
       color: "#ffffff",
-      background: "linear-gradient(135deg, #5c9fe7, #44a1ad)",
+      background: "linear-gradient(135deg, #069b76, #13b58f)",
       boxShadow: "0 6px 18px rgba(15, 23, 42, 0.35)",
       backdropFilter: "blur(8px)",
       WebkitBackdropFilter: "blur(8px)",
