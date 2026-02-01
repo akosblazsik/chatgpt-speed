@@ -1,41 +1,70 @@
 {
    "action": {
       "default_icon": {
-         "128": "icons/icon128.png",
          "16": "icons/icon16.png",
-         "48": "icons/icon48.png"
+         "48": "icons/icon48.png",
+         "128": "icons/icon128.png"
       },
       "default_popup": "src/popup.html"
    },
    "background": {
       "service_worker": "src/background.js"
    },
-   "content_scripts": [ {
-      "js": [ "src/page-inject.js" ],
-      "matches": [ "https://chat.openai.com/*", "https://chatgpt.com/*" ],
-      "run_at": "document_start"
-   }, {
-      "js": [ "src/page-script.js" ],
-      "matches": [ "https://chat.openai.com/*", "https://chatgpt.com/*" ],
-      "run_at": "document_start",
-      "world": "MAIN"
-   }, {
-      "js": [ "src/constants.js", "src/donation_badge.js", "src/active_badge.js", "src/navigation.js", "src/boot.js" ],
-      "matches": [ "https://chat.openai.com/*", "https://chatgpt.com/*" ],
-      "run_at": "document_idle"
-   } ],
+   "content_scripts": [
+      {
+         "js": [
+            "src/page-inject.js"
+         ],
+         "matches": [
+            "https://chat.openai.com/*",
+            "https://chatgpt.com/*"
+         ],
+         "run_at": "document_start"
+      },
+      {
+         "js": [
+            "src/page-script.js"
+         ],
+         "matches": [
+            "https://chat.openai.com/*",
+            "https://chatgpt.com/*"
+         ],
+         "run_at": "document_start",
+         "world": "MAIN"
+      },
+      {
+         "js": [
+            "src/constants.js",
+            "src/donation_badge.js",
+            "src/active_badge.js",
+            "src/navigation.js",
+            "src/boot.js"
+         ],
+         "matches": [
+            "https://chat.openai.com/*",
+            "https://chatgpt.com/*"
+         ],
+         "run_at": "document_idle"
+      }
+   ],
    "description": "Stop browser freezing and lag in long ChatGPT conversations. Instantly speeds up the entire UI and reduces memory usage.",
-   "host_permissions": [ "https://chat.openai.com/*", "https://chatgpt.com/*" ],
+   "host_permissions": [
+      "https://chat.openai.com/*",
+      "https://chatgpt.com/*"
+   ],
    "icons": {
-      "128": "icons/icon128.png",
       "16": "icons/icon16.png",
-      "48": "icons/icon48.png"
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
    },
-   "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAhFJQZe+gXFQyeEFrAXXFZvRPxtJaiO6WlwCETNBhL+F29tCpbUPHN/VUHun8OljnurxLEZi+VdNQDFOWwH6sYpsMgBOH5iKkwjrGV+Aj2nmr9X+vHFPjNpZL1KTFwy0gcuhx6WIiKNpPTyunyEo4iFcUlV5BULY083n5Slm1PStyruUwFSeR2BKeyWTApGFNIHtS2/xWFWrQNpMEJBUBPjXHrQes/Lcu8B44xW6ngrmYYnZsjFOLz2O27l1BgHC4ikDNqr92/zOyYJLPMpYYfDebgR8aKZK8mkvIlwHksmdRsjxEeLoiGIf+UFkzpYGyPu6OUt4dXpEktYDJ0TBhQwIDAQAB",
+   "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEArj80u3BVqsghRtkJ92gZrY989wDRAZP2pUEPU0HvW/ZWtvlofc2vpc4lRKoAJAoTtmhI5+0VRfUdCUgoQpuOtU3sKrndUOqGjN9x8G+FS9or5TJQjZqrLeJxGSZ2NoIVzULiPWNc9rH11Eotu1cheS9IVdBw0p73uxXAYCitvmqWU3ItHxrQ+fMl8llpJmfPgSJNytDkUdWP0jIYMc1MzlSNllOtIPiTXlQOSzdzic7NhP1z543w1lw1emAQsJaKqvi0iETmT6VtFA5RGiwe9++lg/QE7fRaRe5QCBUdCT3a/iSiAHjxyBHIlV3KvSlGSyY4d4jRhvqW5942Qekq+wIDAQAB",
    "manifest_version": 3,
    "name": "ChatGPT Speed – Fix Lag & Freezing in Long Chats",
-   "permissions": [ "storage", "activeTab" ],
+   "permissions": [
+      "storage",
+      "activeTab"
+   ],
    "update_url": "https://clients2.google.com/service/update2/crx",
    "version": "2.0.0",
-   "web_accessible_resources": [  ]
+   "web_accessible_resources": []
 }
