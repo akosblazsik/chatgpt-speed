@@ -120,7 +120,8 @@
     // Preserve original root node
     const originalRootId = path[0];
     const originalRootNode = originalRootId ? mapping[originalRootId] : null;
-    const hasOriginalRoot = originalRootId && originalRootNode;
+    const hasOriginalRoot =
+      originalRootId && originalRootNode && originalRootNode.message;
 
     function isSupportNode(node) {
       const role = node?.message?.author?.role ?? "";
