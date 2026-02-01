@@ -96,13 +96,7 @@ function trimMapping(data, limit) {
 
   const keptRaw = path.slice(cutIndex);
 
-  // Filter to only visible nodes
-  const kept = keptRaw.filter((id) => {
-    const node = mapping[id];
-    return node && isVisibleMessage(node);
-  });
-
-  if (kept.length === 0) {
+  if (keptRaw.length === 0) {
     return null;
   }
 
@@ -111,7 +105,42 @@ function trimMapping(data, limit) {
   const originalRootNode = originalRootId ? mapping[originalRootId] : null;
   const hasOriginalRoot = originalRootId && originalRootNode;
 
-  // Build new mapping
+  function isSupportNode(node) {
+    const role = node?.message?.author?.role ?? "";
+    if (role === "tool") return true;
+    const contentType = node?.message?.content?.content_type;
+    if (contentType && String(contentType).includes("image")) return true;
+    const meta = node?.message?.metadata;
+    if (meta?.attachments || meta?.files || meta?.image || meta?.image_id) return true;
+    return false;
+  }
+
+  const supportSet = new Set();
+  const supportChildrenMap = new Map();
+
+  // Include tool/image support nodes connected to kept nodes
+  const queue = [];
+  for (const id of keptRaw) queue.push({ id, depth: 0, parentIsSupport: false });
+
+  while (queue.length > 0) {
+    const { id, depth, parentIsSupport } = queue.shift();
+    if (depth >= 3) continue;
+    const node = mapping[id];
+    if (!node) continue;
+    const children = Array.isArray(node.children) ? node.children : [];
+    for (const childId of children) {
+      if (!childId || supportSet.has(childId)) continue;
+      const child = mapping[childId];
+      if (!child) continue;
+      const childIsSupport = isSupportNode(child);
+      if (childIsSupport || parentIsSupport) {
+        supportSet.add(childId);
+        queue.push({ id: childId, depth: depth + 1, parentIsSupport: childIsSupport || parentIsSupport });
+      }
+    }
+  }
+
+  // Build new mapping: keep a linear chain for keptRaw, and attach support children
   const newMapping = {};
   let turnsKept = 0;
   let prevRole = null;
@@ -121,36 +150,62 @@ function trimMapping(data, limit) {
     newMapping[originalRootId] = {
       ...originalRootNode,
       parent: null,
-      children: kept[0] ? [kept[0]] : []
+      children: keptRaw[0] ? [keptRaw[0]] : []
     };
   }
 
-  // Add kept visible nodes
-  for (let i = 0; i < kept.length; i++) {
-    const id = kept[i];
+  for (const supportId of supportSet) {
+    const supportNode = mapping[supportId];
+    if (!supportNode) continue;
+    const parentId = supportNode.parent;
+    if (!parentId) continue;
+    if (!supportChildrenMap.has(parentId)) supportChildrenMap.set(parentId, []);
+    supportChildrenMap.get(parentId).push(supportId);
+  }
+
+  for (let i = 0; i < keptRaw.length; i++) {
+    const id = keptRaw[i];
     if (!id) continue;
 
-    const prevId = i === 0 ? (hasOriginalRoot ? originalRootId : null) : kept[i - 1];
-    const nextId = kept[i + 1] ?? null;
     const originalNode = mapping[id];
+    if (!originalNode) continue;
 
-    if (originalNode) {
-      newMapping[id] = {
-        ...originalNode,
-        parent: prevId ?? null,
-        children: nextId ? [nextId] : []
-      };
+    const prevId = i === 0 ? (hasOriginalRoot ? originalRootId : null) : keptRaw[i - 1];
+    const nextId = keptRaw[i + 1] ?? null;
+    const extraChildren = supportChildrenMap.get(id) || [];
+    const children = nextId ? [nextId, ...extraChildren] : [...extraChildren];
 
-      const role = originalNode.message?.author?.role ?? "";
-      if (role !== prevRole && isVisibleMessage(originalNode)) {
-        turnsKept++;
-        prevRole = role;
-      }
+    newMapping[id] = {
+      ...originalNode,
+      parent: prevId ?? null,
+      children
+    };
+
+    const role = originalNode.message?.author?.role ?? "";
+    if (role !== prevRole && isVisibleMessage(originalNode)) {
+      turnsKept++;
+      prevRole = role;
     }
   }
 
-  const newRoot = hasOriginalRoot ? originalRootId : kept[0];
-  const newCurrentNode = kept[kept.length - 1];
+  for (const supportId of supportSet) {
+    if (newMapping[supportId]) continue;
+    const supportNode = mapping[supportId];
+    if (!supportNode) continue;
+    const parentId = supportNode.parent;
+    if (!parentId || !newMapping[parentId]) continue;
+    const children = Array.isArray(supportNode.children)
+      ? supportNode.children.filter((childId) => supportSet.has(childId))
+      : [];
+    newMapping[supportId] = {
+      ...supportNode,
+      parent: parentId,
+      children
+    };
+  }
+
+  const newRoot = hasOriginalRoot ? originalRootId : keptRaw[0];
+  const newCurrentNode = keptRaw[keptRaw.length - 1];
 
   if (!newRoot || !newCurrentNode) {
     return null;
@@ -160,7 +215,7 @@ function trimMapping(data, limit) {
     mapping: newMapping,
     current_node: newCurrentNode,
     root: newRoot,
-    keptCount: kept.length,
+    keptCount: keptRaw.length,
     totalCount,
     visibleKept: turnsKept,
     visibleTotal
