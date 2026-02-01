@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>ChatGPT Speed</title>
+  <link rel="stylesheet" href="popup.css" />
+</head>
+
+<body>
+  <div class="popup-root">
+    <header class="header">
+      <div class="header-title">
+        <span>ChatGPT Speed</span>
+      </div>
+      <div class="header-subtitle">Fix lag & freezing in long chats</div>
+    </header>
+
+    <div class="section-title">PERFORMANCE STATS</div>
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-label">Total Messages</div>
+        <div class="stat-value" id="statTotalMessages">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Rendered</div>
+        <div class="stat-value" id="statRenderedMessages">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Memory Saved</div>
+        <div class="stat-value" id="statMemorySaved">0%</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Status</div>
+        <div class="stat-value status-active" id="statStatus">Active</div>
+      </div>
+    </div>
+
+    <div class="section-title">SETTINGS</div>
+    <div class="settings-card">
+      <div class="setting-row">
+        <div class="setting-text">
+          <div class="setting-title">Enable Speed</div>
+          <div class="setting-description">
+            Optimize ChatGPT for better performance in long conversations.
+          </div>
+        </div>
+        <label class="switch">
+          <input type="checkbox" id="toggleEnabled" />
+          <span class="slider"></span>
+        </label>
+      </div>
+
+      <div class="setting-row">
+        <div class="setting-text">
+          <div class="setting-title">Messages to Show</div>
+          <div class="setting-description">
+            Number of recent messages to show. Increasing this number may cause performance to degrade.
+          </div>
+        </div>
+        <input type="number" id="messageLimit" class="number-input" min="1" max="100" value="10" />
+      </div>
+
+      <div class="setting-row action-row">
+        <button id="refreshBtn" class="refresh-btn">
+          <span>💾</span> Save Settings
+        </button>
+      </div>
+    </div>
+
+    <div class="section-title">ADVANCED</div>
+    <div class="settings-card">
+      <div class="setting-row">
+        <div class="setting-text">
+          <div class="setting-title">Debug Mode</div>
+          <div class="setting-description">
+            Log activity to the DevTools console.
+          </div>
+        </div>
+        <label class="switch">
+          <input type="checkbox" id="toggleDebug" />
+          <span class="slider"></span>
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+
+</html>
