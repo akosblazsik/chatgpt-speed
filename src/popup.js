@@ -233,4 +233,39 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   initHeartAnimation();
+
+  // -------------------------------------------------------------------------
+  // Footer ad-board text animation
+  // -------------------------------------------------------------------------
+  function initAdBoardText() {
+    const board = document.querySelector(".ad-board");
+    if (!board) return;
+    const text = board.textContent || "";
+    board.textContent = "";
+
+    const makeLine = () => {
+      const line = document.createElement("span");
+      line.className = "ad-board-line";
+      Array.from(text).forEach((char) => {
+        const span = document.createElement("span");
+        span.className = "ad-board-char";
+        span.textContent = char === " " ? "\u00A0" : char;
+        line.appendChild(span);
+      });
+      return line;
+    };
+
+    const track = document.createElement("span");
+    track.className = "ad-board-track";
+    track.appendChild(makeLine());
+    track.appendChild(makeLine());
+    board.appendChild(track);
+
+    const charCount = Math.max(1, Array.from(text).length);
+    const durationSeconds = Math.max(10, charCount * 0.15);
+    board.style.setProperty("--char-count", String(charCount));
+    board.style.setProperty("--duration", `${durationSeconds}s`);
+  }
+
+  initAdBoardText();
 });
