@@ -57,7 +57,7 @@
       "48": "icons/icon48.png",
       "128": "icons/icon128.png"
    },
-   "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEArj80u3BVqsghRtkJ92gZrY989wDRAZP2pUEPU0HvW/ZWtvlofc2vpc4lRKoAJAoTtmhI5+0VRfUdCUgoQpuOtU3sKrndUOqGjN9x8G+FS9or5TJQjZqrLeJxGSZ2NoIVzULiPWNc9rH11Eotu1cheS9IVdBw0p73uxXAYCitvmqWU3ItHxrQ+fMl8llpJmfPgSJNytDkUdWP0jIYMc1MzlSNllOtIPiTXlQOSzdzic7NhP1z543w1lw1emAQsJaKqvi0iETmT6VtFA5RGiwe9++lg/QE7fRaRe5QCBUdCT3a/iSiAHjxyBHIlV3KvSlGSyY4d4jRhvqW5942Qekq+wIDAQAB",
+   "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAoKYm8alz8o/YBmXzjXnm5FcMP8jLG10wAJGWDyz53XNCvACg2WD2Zxhn6UvSE5lSUQI9lzDUF1Zosrv1Xb2i9xpaReN+6rEuYdl/OTr/xVSkAEkZkSwoqTdvQTwP4cp3xvrtN5t4R8vTI/lGYQdpyIW0RxZHPpZnZnSFYfSzNXskidDICHSrLuUtkLGKq/BweBEgveiHuhvZKy8xYuIWEY6jgw1i6FDmhM2FqMIHbEfNs+/ipEgPuuWnxw/Ic2KWFgTcT1dg7HZ8gT+Lrg4+4peq0NFWdkOuzQHLiyYEmiqTiL2ez3ynmcXwQyHML65awAf6JyVIXMlj/TSw+m/nOwIDAQAB",
    "manifest_version": 3,
    "name": "ChatGPT Speed – Fix Lag & Freezing in Long Chats",
    "permissions": [
