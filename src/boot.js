@@ -411,10 +411,6 @@
 
         // Reset badges for new chat
         booster.activeBadge.reset();
-        if (booster.DonationBadge) {
-          booster.DonationBadge.reset();
-        }
-
         // Reset stats for new conversation - will be updated when page-script dispatches new status
         // We reset here to avoid showing stale stats from previous conversation
         state.stats = {

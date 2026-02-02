@@ -47,11 +47,6 @@
       const rect = targetEl.getBoundingClientRect();
       let bottomVal = window.innerHeight - rect.top + 10 + stackOffset;
 
-      // If donation badge is visible, stack above it
-      if (booster.DonationBadge && booster.DonationBadge.isVisible) {
-        bottomVal = 180 + stackOffset;
-      }
-
       posStyles = {
         position: "fixed",
         left: `${rect.left}px`,
@@ -109,12 +104,6 @@
    */
   function showActiveBadge() {
     const badge = showBadge("Speed Active", "⚡", BADGE_ATTRIBUTE, 5000, 0);
-
-    // Trigger donation badge after a short delay
-    if (booster.DonationBadge) {
-      setTimeout(() => booster.DonationBadge.onActiveBadgeShown(), 100);
-    }
-
     return badge;
   }
 

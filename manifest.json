@@ -35,7 +35,6 @@
       {
          "js": [
             "src/constants.js",
-            "src/donation_badge.js",
             "src/active_badge.js",
             "src/navigation.js",
             "src/boot.js"
@@ -47,7 +46,7 @@
          "run_at": "document_idle"
       }
    ],
-   "description": "Stop browser freezing and lag in long ChatGPT conversations. Instantly speeds up the entire UI and reduces memory usage.",
+   "description": "ChatGPT Speed is a Chrome extension that reduces lag in long conversations by trimming what the browser renders.",
    "host_permissions": [
       "https://chat.openai.com/*",
       "https://chatgpt.com/*"
@@ -57,14 +56,13 @@
       "48": "icons/icon48.png",
       "128": "icons/icon128.png"
    },
-   "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAoKYm8alz8o/YBmXzjXnm5FcMP8jLG10wAJGWDyz53XNCvACg2WD2Zxhn6UvSE5lSUQI9lzDUF1Zosrv1Xb2i9xpaReN+6rEuYdl/OTr/xVSkAEkZkSwoqTdvQTwP4cp3xvrtN5t4R8vTI/lGYQdpyIW0RxZHPpZnZnSFYfSzNXskidDICHSrLuUtkLGKq/BweBEgveiHuhvZKy8xYuIWEY6jgw1i6FDmhM2FqMIHbEfNs+/ipEgPuuWnxw/Ic2KWFgTcT1dg7HZ8gT+Lrg4+4peq0NFWdkOuzQHLiyYEmiqTiL2ez3ynmcXwQyHML65awAf6JyVIXMlj/TSw+m/nOwIDAQAB",
    "manifest_version": 3,
-   "name": "ChatGPT Speed – Fix Lag & Freezing in Long Chats",
+   "name": "ChatGPT Speed - Make long ChatGPT threads fast again.",
    "permissions": [
       "storage",
       "activeTab"
    ],
    "update_url": "https://clients2.google.com/service/update2/crx",
-   "version": "2.0.0",
+   "version": "1.0.1",
    "web_accessible_resources": []
 }

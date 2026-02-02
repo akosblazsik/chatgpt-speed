@@ -202,39 +202,6 @@ document.addEventListener("DOMContentLoaded", () => {
   updateStatsUI();
 
   // -------------------------------------------------------------------------
-  // Heart Animation for Support Card
-  // -------------------------------------------------------------------------
-  function initHeartAnimation() {
-    const card = document.querySelector(".support-card");
-    if (!card) return;
-
-    function spawnHeart() {
-      const heart = document.createElement("div");
-      heart.classList.add("heart-float");
-      heart.textContent = "❤️";
-
-      const randomLeft = Math.floor(Math.random() * 80) + 10;
-      const randomDuration = Math.random() * 1.5 + 2;
-      const randomSize = Math.floor(Math.random() * 8) + 10;
-
-      heart.style.left = `${randomLeft}%`;
-      heart.style.fontSize = `${randomSize}px`;
-      heart.style.animationDuration = `${randomDuration}s`;
-
-      card.appendChild(heart);
-
-      setTimeout(() => {
-        heart.remove();
-      }, randomDuration * 1000);
-    }
-
-    setInterval(spawnHeart, 1200);
-    spawnHeart();
-  }
-
-  initHeartAnimation();
-
-  // -------------------------------------------------------------------------
   // Footer ad-board text animation
   // -------------------------------------------------------------------------
   function initAdBoardText() {
@@ -268,4 +235,5 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   initAdBoardText();
+
 });
