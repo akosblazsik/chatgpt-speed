@@ -1,4 +1,5 @@
 /target
+/keys
 main-v*.rs
 /.key/
 /assets/source-icons/

@@ -1,5 +1,13 @@
 # Release Notes
 
+## v1.0.11 — Verified uploads packaging
+
+### 🛠️ Improvements
+- Added packaging guidance and key safety notes for Verified CRX Uploads.
+- Packaging script now generates a 2048-bit RSA key when missing.
+
+---
+
 ## v1.0.10 — Config defaults centralization
 
 ### 🛠️ Improvements

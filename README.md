@@ -56,6 +56,30 @@ Use the links in the [Download](#download) section above.
 5. Select the project folder.
 6. Open ChatGPT — the extension runs automatically.
 
+## Package
+
+To ship updates with an additional security layer, use **Verified CRX Uploads** in the Chrome Web Store
+package workflow. This ensures the uploaded bundle matches the signed CRX expected by the store.
+
+Release bundle creation:
+- Run `./package.sh` to generate the zip in `target/`.
+- Upload the zip via the Chrome Web Store package page with Verified CRX Uploads enabled.
+
+### RSA Key Pair (Required)
+
+Generate a 2048-bit RSA private key:
+```bash
+openssl genpkey -algorithm RSA -pkeyopt rsa_keygen_bits:2048 -out privatekey.pem
+```
+
+### Private Key Safety (Read Carefully)
+
+Warning: Ensure that you keep your private key safe and secure. In particular:
+- Do not upload the private key to any public repository or other place.
+- Do not store your private key in your Google Account. This means someone with access to the Developer Dashboard through your Google Account could publish on your behalf.
+- Consider storing your private key securely using a keystore like PKCS#12 or Java Keystore.
+- Warning: Do not lose your private key; otherwise, you must reach out to CWS support, and replacement can take up to one week.
+
 ## Settings
 
 Click the extension icon to access:
