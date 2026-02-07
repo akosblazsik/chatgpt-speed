@@ -1,11 +1,12 @@
 {
    "action": {
       "default_icon": {
-         "16": "icons/icon16.png",
-         "48": "icons/icon48.png",
-         "128": "icons/icon128.png"
+         "16": "assets/icons/icon16.png",
+         "48": "assets/icons/icon48.png",
+         "128": "assets/icons/icon128.png"
       },
-      "default_popup": "src/popup.html"
+      "default_popup": "src/popup.html",
+      "default_title": "ChatGPT Speed"
    },
    "background": {
       "service_worker": "src/background.js"
@@ -52,17 +53,18 @@
       "https://chatgpt.com/*"
    ],
    "icons": {
-      "16": "icons/icon16.png",
-      "48": "icons/icon48.png",
-      "128": "icons/icon128.png"
+      "16": "assets/icons/icon16.png",
+      "48": "assets/icons/icon48.png",
+      "128": "assets/icons/icon128.png"
    },
    "manifest_version": 3,
+   "minimum_chrome_version": "110",
    "name": "ChatGPT Speed - Make long ChatGPT threads fast again.",
    "permissions": [
       "storage",
       "activeTab"
    ],
    "update_url": "https://clients2.google.com/service/update2/crx",
-   "version": "1.0.6",
+   "version": "1.0.7",
    "web_accessible_resources": []
 }

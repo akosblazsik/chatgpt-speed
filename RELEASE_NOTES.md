@@ -1,5 +1,14 @@
 # Release Notes
 
+## v1.0.7 — Manifest & packaging hygiene
+
+### 🛠️ Improvements
+- Added `minimum_chrome_version` and `action.default_title`.
+- Debug logs in background/popup now respect Debug Mode.
+- Packaging updated to include only runtime icons (source icon assets excluded).
+
+---
+
 ## v1.0.6 — Stability and reliability fixes
 
 ### 🛠️ Fixes

@@ -12,6 +12,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const maxExtraMessagesEl = document.getElementById("maxExtraMessages");
   const refreshBtn = document.getElementById("refreshBtn");
   const themeModeEl = document.getElementById("themeMode");
+  let debugEnabled = false;
 
   // Storage keys
   const SETTINGS_KEY = "csb_settings";
@@ -96,6 +97,7 @@ document.addEventListener("DOMContentLoaded", () => {
     { [SETTINGS_KEY]: { enabled: true, messageLimit: 15, maxExtraMessages: 300, debug: false, theme: "system" } },
     (data) => {
     const settings = data[SETTINGS_KEY];
+    debugEnabled = settings.debug;
     toggleEnabledEl.checked = settings.enabled;
     messageLimitEl.value = settings.messageLimit;
     maxExtraMessagesEl.value = settings.maxExtraMessages ?? 300;
@@ -131,6 +133,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Handle debug toggle change
   toggleDebugEl.addEventListener("change", () => {
+    debugEnabled = toggleDebugEl.checked;
     saveSettings();
   });
 
@@ -185,10 +188,12 @@ document.addEventListener("DOMContentLoaded", () => {
         { type: "getStats" },
         (response) => {
           if (chrome.runtime.lastError) {
-            console.debug(
-              "[ChatGPT Speed] No stats available:",
-              chrome.runtime.lastError.message
-            );
+            if (debugEnabled) {
+              console.debug(
+                "[ChatGPT Speed] No stats available:",
+                chrome.runtime.lastError.message
+              );
+            }
             return;
           }
 

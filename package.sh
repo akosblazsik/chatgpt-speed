@@ -16,11 +16,12 @@ OUT="$TARGET_DIR/chatgpt-speed-v${VERSION}.zip"
 FILES=(
   manifest.json
   src
-  icons
+  assets/icons
   LICENSE
   THIRD_PARTY_LICENSES.md
   privacy-policy.md
   README.md
+  RELEASE_NOTES.md
 )
 
 INCLUDE=()

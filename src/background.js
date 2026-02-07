@@ -6,6 +6,15 @@
 chrome.runtime.onInstalled.addListener((details) => {
   const SETTINGS_KEY = "csb_settings";
 
+  function logIfDebug(...args) {
+    chrome.storage.sync.get({ [SETTINGS_KEY]: { debug: false } }, (data) => {
+      const settings = data[SETTINGS_KEY] || {};
+      if (settings.debug) {
+        console.log(...args);
+      }
+    });
+  }
+
   if (details.reason === "install") {
     chrome.storage.sync.set({
       [SETTINGS_KEY]: {
@@ -14,11 +23,11 @@ chrome.runtime.onInstalled.addListener((details) => {
         debug: false
       }
     });
-    console.log("ChatGPT Speed installed.");
+    logIfDebug("ChatGPT Speed installed.");
   }
 
   if (details.reason === "update") {
-    console.log(
+    logIfDebug(
       "ChatGPT Speed updated to version",
       chrome.runtime.getManifest().version
     );
