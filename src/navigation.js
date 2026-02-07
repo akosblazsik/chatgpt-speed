@@ -151,7 +151,7 @@
       if (!container) return;
 
       // Find the first visible message to anchor to
-      const articles = Array.from(document.querySelectorAll('article[data-testid^="conversation-turn-"]'));
+      const articles = Array.from(getMessagesContainer()?.querySelectorAll('article[data-testid^="conversation-turn-"]') || []);
       
       let anchorId = null;
       let anchorType = "testid"; // 'testid' or 'uuid'
@@ -252,7 +252,7 @@
   // Watch for messages to be rendered and then restore scroll
   let scrollRestoreObserver = null;
   let scrollRestoreRetryCount = 0;
-  const MAX_SCROLL_RESTORE_RETRIES = 10;
+  const MAX_SCROLL_RESTORE_RETRIES = 6;
 
   function attemptScrollRestore() {
     if (restoreScrollPositionNow()) {
@@ -278,7 +278,8 @@
     scrollRestoreRetryCount++;
     if (scrollRestoreRetryCount < MAX_SCROLL_RESTORE_RETRIES) {
       log(`Scroll restore retry ${scrollRestoreRetryCount}/${MAX_SCROLL_RESTORE_RETRIES}...`);
-      setTimeout(attemptScrollRestore, 500);
+      const delay = 150 * scrollRestoreRetryCount;
+      setTimeout(attemptScrollRestore, delay);
     } else {
       log("Scroll restore failed after max retries - anchor element never appeared");
       sessionStorage.removeItem(SCROLL_RESTORE_KEY);
@@ -297,7 +298,7 @@
     // Use MutationObserver to watch for message articles appearing
     scrollRestoreObserver = new MutationObserver((mutations, observer) => {
       // Look for article elements (messages)
-      const articles = document.querySelectorAll('article[data-testid^="conversation-turn-"]');
+      const articles = getMessagesContainer()?.querySelectorAll('article[data-testid^="conversation-turn-"]') || [];
       
       // Wait until at least 5 articles are rendered (or fewer if that's all there are)
       if (articles.length >= 5) {

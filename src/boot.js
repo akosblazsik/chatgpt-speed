@@ -149,16 +149,25 @@
   // ---- Message Counter for Performance Warning ----------------------------
 
   let messageWatcherObserver = null;
+  let messageObserverTarget = null;
   let baselineMessageCount = null;
   let lastKnownMessageCount = 0;
   let performanceWarningShown = false;
   let checkDebounceTimer = null;
+  let checkScheduled = false;
 
   /**
    * Count the number of visible message turns in the DOM.
    */
+  function getMessageContainer() {
+    const firstArticle = document.querySelector('article[data-testid^="conversation-turn-"]');
+    return firstArticle?.parentElement || null;
+  }
+
   function countMessageTurns() {
-    const articles = document.querySelectorAll('article[data-testid^="conversation-turn-"]');
+    const container = getMessageContainer();
+    if (!container) return 0;
+    const articles = container.querySelectorAll('article[data-testid^="conversation-turn-"]');
     return articles.length;
   }
 
@@ -225,7 +234,20 @@
       clearTimeout(checkDebounceTimer);
     }
     checkDebounceTimer = setTimeout(() => {
-      checkForPerformanceWarning();
+      checkDebounceTimer = null;
+      if (checkScheduled) return;
+      checkScheduled = true;
+
+      const runCheck = () => {
+        checkScheduled = false;
+        checkForPerformanceWarning();
+      };
+
+      if ("requestIdleCallback" in window) {
+        requestIdleCallback(runCheck, { timeout: 1000 });
+      } else {
+        requestAnimationFrame(runCheck);
+      }
     }, 2000); // Wait 2 seconds after last mutation
   }
 
@@ -237,9 +259,31 @@
       messageWatcherObserver.disconnect();
     }
 
-    const observeTarget = document.querySelector('main') || document.body;
+    function getObserverTarget() {
+      const firstArticle = document.querySelector('article[data-testid^="conversation-turn-"]');
+      if (firstArticle && firstArticle.parentElement) {
+        return firstArticle.parentElement;
+      }
+      return document.querySelector('main') || document.body;
+    }
+
+    messageObserverTarget = getObserverTarget();
 
     messageWatcherObserver = new MutationObserver((mutations) => {
+      if (messageObserverTarget && messageObserverTarget !== document.body) {
+        const nextTarget = getObserverTarget();
+        if (nextTarget && nextTarget !== messageObserverTarget) {
+          messageObserverTarget = nextTarget;
+          messageWatcherObserver.disconnect();
+          messageWatcherObserver.observe(messageObserverTarget, {
+            childList: true,
+            subtree: true
+          });
+          log("Message watcher target updated");
+          return;
+        }
+      }
+
       const hasRelevantMutation = mutations.some(mutation => {
         if (mutation.type !== 'childList') return false;
         if (mutation.addedNodes.length === 0) return false;
@@ -258,7 +302,7 @@
       }
     });
 
-    messageWatcherObserver.observe(observeTarget, {
+    messageWatcherObserver.observe(messageObserverTarget, {
       childList: true,
       subtree: true
     });
@@ -285,10 +329,12 @@
     baselineMessageCount = null;
     lastKnownMessageCount = 0;
     performanceWarningShown = false;
+    messageObserverTarget = null;
     if (checkDebounceTimer) {
       clearTimeout(checkDebounceTimer);
       checkDebounceTimer = null;
     }
+    checkScheduled = false;
     log("Message watcher state reset");
   }
 

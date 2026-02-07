@@ -1,5 +1,20 @@
 # Release Notes
 
+## v1.0.4 — Performance and stability improvements
+
+This release further reduces background work while keeping behavior unchanged.
+
+### ⚡ Performance improvements
+- Single‑pass turn boundary computation in trimmers.
+- Smarter status dispatch (skip duplicates).
+- Targeted DOM observers for message watching.
+- Reduced global DOM queries for scroll/save + message counting.
+- Scroll restore retries with backoff (fewer retries).
+- Mutation-based button reinsertion (no polling).
+- Cached scroll container lookup.
+
+---
+
 ## v1.0.3 — Configurable max extra messages
 
 This release adds a setting to cap how many older messages can be loaded.
