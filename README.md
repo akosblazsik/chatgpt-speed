@@ -10,7 +10,7 @@ ChatGPT Speed is a **Chrome** extension that reduces lag in long conversations b
 
 | Browser | Store Link |
 | :--- | :--- |
-| **Google Chrome** | [**Download from Chrome Web Store**](https://chromewebstore.google.com/detail/finipiejpmpccemiedioehhpgcafnndo?utm_source=item-share-cb) |
+| **Google Chrome** | [**Download from Chrome Web Store**](https://chromewebstore.google.com/detail/denmnkfiabmkhgkacnappiekcfclbogk?utm_source=item-share-cb) |
 
 Source: https://github.com/akosblazsik/chatgpt-speed
 
