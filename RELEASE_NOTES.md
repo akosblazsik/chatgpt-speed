@@ -5,6 +5,7 @@
 ### 🛠️ Improvements
 - Added packaging guidance and key safety notes for Verified CRX Uploads.
 - Packaging script now generates a 2048-bit RSA key when missing.
+- Added light/dark Chrome Web Store screenshots to the release package.
 
 ---
 
