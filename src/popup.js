@@ -80,6 +80,12 @@ document.addEventListener("DOMContentLoaded", () => {
    */
   function syncSettingsToActiveTab(settings) {
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+      if (chrome.runtime.lastError) {
+        if (debugEnabled) {
+          console.debug("[ChatGPT Speed] tabs.query failed:", chrome.runtime.lastError.message);
+        }
+        return;
+      }
       const activeTab = tabs[0];
       if (!activeTab || !activeTab.id) return;
 
@@ -146,9 +152,19 @@ document.addEventListener("DOMContentLoaded", () => {
   // Handle refresh button
   refreshBtn.addEventListener("click", () => {
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+      if (chrome.runtime.lastError) {
+        if (debugEnabled) {
+          console.debug("[ChatGPT Speed] tabs.query failed:", chrome.runtime.lastError.message);
+        }
+        return;
+      }
       const activeTab = tabs[0];
       if (activeTab && activeTab.id) {
-        chrome.tabs.reload(activeTab.id);
+        chrome.tabs.reload(activeTab.id, () => {
+          if (chrome.runtime.lastError && debugEnabled) {
+            console.debug("[ChatGPT Speed] tabs.reload failed:", chrome.runtime.lastError.message);
+          }
+        });
         window.close();
       }
     });
@@ -159,6 +175,12 @@ document.addEventListener("DOMContentLoaded", () => {
    */
   function updateStatsUI() {
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+      if (chrome.runtime.lastError) {
+        if (debugEnabled) {
+          console.debug("[ChatGPT Speed] tabs.query failed:", chrome.runtime.lastError.message);
+        }
+        return;
+      }
       const activeTab = tabs[0];
       if (!activeTab || activeTab.id == null) return;
 

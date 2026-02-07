@@ -58,13 +58,12 @@ window.ChatGPTSpeedBooster = window.ChatGPTSpeedBooster || {};
 ┌──────────────────────────────────────────────┐
 │  ChatGPT Speed (debug mode enabled)  │
 └──────────────────────────────────────────────┘
-Made by Bram van der Giessen
+Maintained by Ákos Blázsik
 
 Debug mode is enabled for this extension.
 To disable, open the extension popup and uncheck "Debug Mode".
 
-⭐ GitHub: https://github.com/bramgiessen
-🧑‍💻 Hire me: https://bramgiessen.com
+⭐ GitHub: https://github.com/akosblazsik/chatgpt-speed
 `,
       "color:#4c8bf5; font-size:15px; font-weight:bold;"
     );

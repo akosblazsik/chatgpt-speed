@@ -1,11 +1,22 @@
 # Release Notes
 
+## v1.0.8 — Ownership and metadata updates
+
+### 🛠️ Updates
+- Updated `homepage_url` to the new repository.
+- Refreshed debug promo copy to reflect new maintainer.
+- Added source repo link to README.
+
+---
+
 ## v1.0.7 — Manifest & packaging hygiene
 
 ### 🛠️ Improvements
 - Added `minimum_chrome_version` and `action.default_title`.
 - Debug logs in background/popup now respect Debug Mode.
 - Packaging updated to include only runtime icons (source icon assets excluded).
+- Added `homepage_url` and `version_name` to the manifest.
+- Popup now guards `chrome.tabs` calls with `runtime.lastError`.
 
 ---
 

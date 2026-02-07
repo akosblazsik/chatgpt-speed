@@ -12,6 +12,8 @@ ChatGPT Speed is a **Chrome** extension that reduces lag in long conversations b
 | :--- | :--- |
 | **Google Chrome** | [**Download from Chrome Web Store**](https://chromewebstore.google.com/detail/finipiejpmpccemiedioehhpgcafnndo?utm_source=item-share-cb) |
 
+Source: https://github.com/akosblazsik/chatgpt-speed
+
 ---
 
 ## Support
@@ -59,6 +61,7 @@ Use the links in the [Download](#download) section above.
 Click the extension icon to access:
 - **Enable Speed:** Toggle optimization on/off.
 - **Messages to Show:** Set how many recent messages to keep visible (default: 15, range: 1–100).
+- **Max Extra Messages:** Cap how many older messages can be loaded beyond the base limit.
 - **Debug Mode:** Enable detailed console logs for troubleshooting.
 - **Save Settings:** Refreshes the current ChatGPT tab after updating settings.
 
