@@ -1,5 +1,13 @@
 # Release Notes
 
+## v1.0.12 — Runtime messaging hardening
+
+### 🔒 Security & reliability
+- Hardened runtime page↔content messaging with stricter validation and trusted-source checks.
+- Tightened message envelope handling to reduce malformed or cross-context message risks.
+
+---
+
 ## v1.0.11 — Verified uploads packaging
 
 ### 🛠️ Improvements

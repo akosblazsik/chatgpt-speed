@@ -106,12 +106,51 @@
 
   // ---- Message listener for popup and settings sync ---------------------
 
-  chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
-    if (!message) return;
+  function isTrustedRuntimeSender(sender) {
+    if (!sender || typeof sender !== "object") return false;
+    if (sender.id !== chrome.runtime.id) return false;
+
+    // Messages from extension pages (popup/options) won't include sender.tab.
+    const extensionOrigin = chrome.runtime.getURL("");
+    if (typeof sender.url === "string" && sender.url.startsWith(extensionOrigin)) {
+      return true;
+    }
+
+    // Messages from other content scripts include sender.tab.
+    if (!Number.isInteger(sender.tab?.id)) return false;
+
+    const tabUrl = sender.tab?.url;
+    if (typeof tabUrl !== "string") return false;
+
+    return tabUrl.startsWith(window.location.origin + "/");
+  }
+
+  function isGetStatsMessage(message) {
+    if (!message || typeof message !== "object") return false;
+    return message.type === "getStats";
+  }
+
+  function isSyncSettingsMessage(message) {
+    if (!message || typeof message !== "object") return false;
+    if (message.type !== "syncSettings") return false;
+    if (!message.settings || typeof message.settings !== "object") return false;
+    return true;
+  }
+
+  chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+    if (!isTrustedRuntimeSender(sender)) {
+      return;
+    }
+
+    if (!message || typeof message !== "object" || typeof message.type !== "string") {
+      sendResponse({ ok: false, error: "invalid_message" });
+      return true;
+    }
 
     // Handle stats request from popup
-    if (message.type === "getStats") {
+    if (isGetStatsMessage(message)) {
       sendResponse({
+        ok: true,
         totalMessages: state.stats.totalMessages,
         renderedMessages: state.stats.renderedMessages,
         enabled: state.enabled
@@ -120,10 +159,14 @@
     }
 
     // Handle settings sync from popup
-    if (message.type === "syncSettings") {
+    if (isSyncSettingsMessage(message)) {
       syncSettingsToLocalStorage(message.settings);
+      sendResponse({ ok: true });
       return true;
     }
+
+    sendResponse({ ok: false, error: "unsupported_message" });
+    return true;
   });
 
   // ---- Listen for status updates from page-script -----------------------

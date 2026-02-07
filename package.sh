@@ -26,7 +26,8 @@ FILES=(
   manifest.json
   src
   assets/icons
-  assets/Screenshot.png
+  assets/Screenshot-light.png
+  assets/Screenshot-dark.png
   LICENSE
   THIRD_PARTY_LICENSES.md
   privacy-policy.md
