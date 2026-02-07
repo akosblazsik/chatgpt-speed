@@ -24,6 +24,7 @@ window.ChatGPTSpeedBooster = window.ChatGPTSpeedBooster || {};
     enabled: true,
     debug: false,
     messageLimit: 15,
+    maxExtraMessages: 300,
 
     /** Stats for popup display */
     stats: {

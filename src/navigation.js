@@ -78,6 +78,10 @@
 
   function setExtraMessages(extra) {
     try {
+      const current = getExtraMessages();
+      if (current === extra) {
+        return;
+      }
       sessionStorage.setItem(NAV_FLAG_KEY, "true");
       localStorage.setItem(EXTRA_MESSAGES_KEY, JSON.stringify({
         url: window.location.href,
@@ -329,6 +333,7 @@
   function loadOlderMessages() {
     const limit = state.messageLimit || 10;
     const currentExtra = getExtraMessages();
+    const maxExtra = Math.max(0, state.maxExtraMessages ?? Math.max(50, limit * 20));
     
     // Calculate new messages added during this session
     let newMessages = 0;
@@ -338,7 +343,7 @@
     
     // Increment extra messages by the limit PLUS any new messages that pushed old ones out
     // If user added 15 messages, we need to request 15 + 15 = 30 extra to see 15 old ones.
-    const newExtra = currentExtra + limit + newMessages;
+    const newExtra = Math.min(currentExtra + limit + newMessages, maxExtra);
     
     log(`Loading ${limit} more older messages (total extra: ${newExtra})`);
     

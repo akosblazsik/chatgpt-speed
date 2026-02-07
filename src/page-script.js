@@ -70,45 +70,31 @@
 
     path.reverse();
 
-    // Count total visible turns
-    let visibleTotal = 0;
+    // Build visible turn boundaries in one pass
+    const turnStarts = [];
     let lastVisibleRole = null;
 
-    for (const nodeId of path) {
+    for (let i = 0; i < path.length; i++) {
+      const nodeId = path[i];
       const node = mapping[nodeId];
-      if (node && isVisibleMessage(node)) {
-        const role = node.message?.author?.role ?? "";
-        if (role !== lastVisibleRole) {
-          visibleTotal++;
-          lastVisibleRole = role;
-        }
+      if (!node || !isVisibleMessage(node)) continue;
+      const role = node.message?.author?.role ?? "";
+      if (role !== lastVisibleRole) {
+        turnStarts.push(i);
+        lastVisibleRole = role;
       }
     }
+
+    const visibleTotal = turnStarts.length;
 
     // Calculate effective limit (base + extra)
     const effectiveLimit = Math.max(1, limit + extraMessages);
 
-    // Find cut point (keep last effectiveLimit turns)
-    let turnCount = 0;
+    // Determine cut index based on turn boundaries
     let cutIndex = 0;
-    let lastRole = null;
-
-    for (let i = path.length - 1; i >= 0; i--) {
-      const nodeId = path[i];
-      if (!nodeId) continue;
-
-      const node = mapping[nodeId];
-      if (node && isVisibleMessage(node)) {
-        const role = node.message?.author?.role ?? "";
-        if (role !== lastRole) {
-          turnCount++;
-          lastRole = role;
-        }
-        if (turnCount > effectiveLimit) {
-          cutIndex = i + 1;
-          break;
-        }
-      }
+    if (visibleTotal > effectiveLimit) {
+      const startTurnIndex = visibleTotal - effectiveLimit;
+      cutIndex = turnStarts[startTurnIndex];
     }
 
     const keptRaw = path.slice(cutIndex);
@@ -314,7 +300,21 @@
   // Status Dispatch
   // ============================================================================
 
+  let lastDispatchedStatus = null;
+
   function dispatchStatus(status) {
+    if (lastDispatchedStatus) {
+      const same =
+        lastDispatchedStatus.totalMessages === status.totalMessages &&
+        lastDispatchedStatus.renderedMessages === status.renderedMessages &&
+        lastDispatchedStatus.extraMessages === status.extraMessages &&
+        lastDispatchedStatus.hasOlderMessages === status.hasOlderMessages;
+      if (same) {
+        return;
+      }
+    }
+    lastDispatchedStatus = status;
+
     // Use postMessage to communicate with content script (across context boundary)
     window.postMessage({
       type: "csb-status",

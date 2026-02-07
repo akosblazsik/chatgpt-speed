@@ -61,6 +61,16 @@
         <input type="number" id="messageLimit" class="number-input" min="1" max="100" value="10" />
       </div>
 
+      <div class="setting-row">
+        <div class="setting-text">
+          <div class="setting-title">Max Extra Messages</div>
+          <div class="setting-description">
+            Limit how many older messages can be loaded beyond the base amount.
+          </div>
+        </div>
+        <input type="number" id="maxExtraMessages" class="number-input" min="0" max="1000" value="300" />
+      </div>
+
       <div class="setting-row action-row">
         <button id="refreshBtn" class="refresh-btn">
           <span>💾</span> Save Settings

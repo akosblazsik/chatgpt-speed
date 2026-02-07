@@ -1,5 +1,14 @@
 # Release Notes
 
+## v1.0.3 — Configurable max extra messages
+
+This release adds a setting to cap how many older messages can be loaded.
+
+### ⚙️ New setting
+- Added **Max Extra Messages** to limit how many older turns can be fetched.
+
+---
+
 ## v1.0.2 — Performance optimizations (no behavior change)
 
 This release keeps 1.0.1 behavior, but reduces CPU/GC overhead.

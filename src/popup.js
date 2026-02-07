@@ -9,6 +9,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const toggleEnabledEl = document.getElementById("toggleEnabled");
   const toggleDebugEl = document.getElementById("toggleDebug");
   const messageLimitEl = document.getElementById("messageLimit");
+  const maxExtraMessagesEl = document.getElementById("maxExtraMessages");
   const refreshBtn = document.getElementById("refreshBtn");
   const themeModeEl = document.getElementById("themeMode");
 
@@ -62,6 +63,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const settings = {
       enabled: toggleEnabledEl.checked,
       messageLimit: parseInt(messageLimitEl.value, 10) || 10,
+      maxExtraMessages: parseInt(maxExtraMessagesEl.value, 10) || 300,
       debug: toggleDebugEl.checked,
       theme: themeModeEl.value
     };
@@ -91,11 +93,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Load initial settings from storage
   chrome.storage.sync.get(
-    { [SETTINGS_KEY]: { enabled: true, messageLimit: 15, debug: false, theme: "system" } },
+    { [SETTINGS_KEY]: { enabled: true, messageLimit: 15, maxExtraMessages: 300, debug: false, theme: "system" } },
     (data) => {
     const settings = data[SETTINGS_KEY];
     toggleEnabledEl.checked = settings.enabled;
     messageLimitEl.value = settings.messageLimit;
+    maxExtraMessagesEl.value = settings.maxExtraMessages ?? 300;
     toggleDebugEl.checked = settings.debug;
     themeModeEl.value = settings.theme || "system";
     updateStatusText(settings.enabled);
@@ -115,6 +118,14 @@ document.addEventListener("DOMContentLoaded", () => {
     if (isNaN(value) || value < 1) value = 1;
     if (value > 100) value = 100;
     messageLimitEl.value = value;
+    saveSettings();
+  });
+
+  maxExtraMessagesEl.addEventListener("change", () => {
+    let value = parseInt(maxExtraMessagesEl.value, 10);
+    if (isNaN(value) || value < 0) value = 0;
+    if (value > 1000) value = 1000;
+    maxExtraMessagesEl.value = value;
     saveSettings();
   });
 

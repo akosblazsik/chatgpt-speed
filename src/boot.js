@@ -19,6 +19,7 @@
       const cfg = {
         enabled: settings.enabled ?? true,
         messageLimit: settings.messageLimit ?? 10,
+        maxExtraMessages: settings.maxExtraMessages ?? 300,
         debug: settings.debug ?? false
       };
       localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(cfg));
@@ -37,11 +38,12 @@
   // ---- Storage: enabled + debug flags -----------------------------------
 
   function initializeStorageListeners() {
-    chrome.storage.sync.get({ [SETTINGS_KEY]: { enabled: true, messageLimit: 15, debug: false } }, (data) => {
+    chrome.storage.sync.get({ [SETTINGS_KEY]: { enabled: true, messageLimit: 15, maxExtraMessages: 300, debug: false } }, (data) => {
       const settings = data[SETTINGS_KEY];
       state.enabled = settings.enabled;
       state.debug = settings.debug;
       state.messageLimit = settings.messageLimit;
+      state.maxExtraMessages = settings.maxExtraMessages ?? 300;
 
       // Sync to localStorage for page-script
       syncSettingsToLocalStorage(settings);
@@ -69,6 +71,7 @@
         state.enabled = settings.enabled;
         state.debug = settings.debug;
         state.messageLimit = settings.messageLimit;
+        state.maxExtraMessages = settings.maxExtraMessages ?? 300;
 
         // Sync to localStorage
         syncSettingsToLocalStorage(settings);

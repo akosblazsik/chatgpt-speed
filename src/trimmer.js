@@ -54,44 +54,30 @@ function trimMapping(data, limit) {
   path.reverse();
 
   const totalCount = path.length;
-  const effectiveLimit = Math.max(1, limit);
 
-  // Count total visible turns
-  let visibleTotal = 0;
+  // Build visible turn boundaries in one pass
+  const turnStarts = [];
   let lastVisibleRole = null;
-  
-  for (const nodeId of path) {
+
+  for (let i = 0; i < path.length; i++) {
+    const nodeId = path[i];
     const node = mapping[nodeId];
     if (node && isVisibleMessage(node)) {
       const role = node.message?.author?.role ?? "";
       if (role !== lastVisibleRole) {
-        visibleTotal++;
+        turnStarts.push(i);
         lastVisibleRole = role;
       }
     }
   }
 
-  // Find cut point by counting turns backwards
-  let turnCount = 0;
+  const visibleTotal = turnStarts.length;
+  const effectiveLimit = Math.max(1, limit);
+
   let cutIndex = 0;
-  let lastRole = null;
-
-  for (let i = path.length - 1; i >= 0; i--) {
-    const nodeId = path[i];
-    if (!nodeId) continue;
-
-    const node = mapping[nodeId];
-    if (node && isVisibleMessage(node)) {
-      const role = node.message?.author?.role ?? "";
-      if (role !== lastRole) {
-        turnCount++;
-        lastRole = role;
-      }
-      if (turnCount > effectiveLimit) {
-        cutIndex = i + 1;
-        break;
-      }
-    }
+  if (visibleTotal > effectiveLimit) {
+    const startTurnIndex = visibleTotal - effectiveLimit;
+    cutIndex = turnStarts[startTurnIndex];
   }
 
   const keptRaw = path.slice(cutIndex);
