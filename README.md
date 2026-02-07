@@ -124,6 +124,17 @@ This reduces risk of untrusted page scripts spoofing extension-internal status m
 `src/config.js` provides a single `DEFAULT_SETTINGS` object and `normalizeSettings()` helper.
 These are reused by page/content/popup scripts to avoid drift in defaults and clamping rules.
 
+
+## CI & Permission Change Guard
+
+Repository CI runs lint plus manifest/package validation.
+
+If a pull request adds any new `permissions`, `optional_permissions`, or `host_permissions` in `manifest.json`, CI requires an explicit PR-body acknowledgment line:
+
+`Permission-Review: approved`
+
+This keeps permission widening visible and intentionally reviewed.
+
 ## License
 
 This project is licensed under the MIT License. See `LICENSE`.

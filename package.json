@@ -1,0 +1,16 @@
+{
+  "name": "chatgpt-speed",
+  "private": true,
+  "version": "1.0.13",
+  "description": "Tooling for ChatGPT Speed Chrome extension",
+  "scripts": {
+    "lint": "eslint \"src/**/*.js\"",
+    "validate:manifest": "node scripts/validate-manifest.mjs",
+    "validate:package": "node scripts/validate-package.mjs",
+    "check:permissions": "node scripts/check-permission-widening.mjs",
+    "ci:checks": "npm run lint && npm run validate:manifest && npm run validate:package"
+  },
+  "devDependencies": {
+    "eslint": "^9.20.0"
+  }
+}

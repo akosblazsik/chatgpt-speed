@@ -1,5 +1,14 @@
 # Release Notes
 
+## v1.0.13 — Tooling and CI checks
+
+### 🛠️ Maintenance
+- Added ESLint for extension JavaScript with baseline safety rules.
+- Added CI workflow to run lint and manifest/package validation.
+- Added permission-widening guard that requires an explicit review note.
+
+---
+
 ## v1.0.12 — Runtime messaging hardening
 
 ### 🔒 Security & reliability

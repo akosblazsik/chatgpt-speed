@@ -3,3 +3,4 @@
 main-v*.rs
 /.key/
 /assets/source-icons/
+/node_modules/
