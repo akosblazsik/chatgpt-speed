@@ -1,5 +1,12 @@
 # Release Notes
 
+## v1.0.10 — Config defaults centralization
+
+### 🛠️ Improvements
+- Centralized runtime state defaults to use shared config defaults to avoid drift.
+
+---
+
 ## v1.0.9 — Message validation + shared config
 
 ### 🔒 Security & reliability

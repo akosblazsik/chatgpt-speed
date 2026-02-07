@@ -7,6 +7,8 @@ window.ChatGPTSpeedBooster = window.ChatGPTSpeedBooster || {};
 
 (function initializeConstants() {
   const booster = window.ChatGPTSpeedBooster;
+  const defaultSettings =
+    window.ChatGPTSpeedConfig?.DEFAULT_SETTINGS || Object.freeze({});
 
   /**
    * Static configuration.
@@ -21,10 +23,10 @@ window.ChatGPTSpeedBooster = window.ChatGPTSpeedBooster || {};
    */
   booster.state = {
     lastUrl: window.location.href,
-    enabled: true,
-    debug: false,
-    messageLimit: 15,
-    maxExtraMessages: 300,
+    enabled: defaultSettings.enabled ?? true,
+    debug: defaultSettings.debug ?? false,
+    messageLimit: defaultSettings.messageLimit ?? 15,
+    maxExtraMessages: defaultSettings.maxExtraMessages ?? 300,
 
     /** Stats for popup display */
     stats: {
