@@ -103,6 +103,14 @@ ChatGPT Speed uses three execution contexts with different capabilities:
 3. **Extension UI/background (`src/popup.js`, `src/background.js`):**
    - Store settings in `chrome.storage.sync` and render popup controls.
 
+### Context boundaries
+
+Each context has a narrow responsibility and a clear data surface:
+
+- **Popup/background:** Owns user settings persistence and UI.
+- **Content scripts:** Mediate between extension storage/APIs and the page, and handle navigation glue.
+- **Page script:** Owns fetch interception + trimming logic and reports status outward.
+
 ### Messaging hardening
 
 Cross-context messages use a namespaced envelope:
@@ -119,10 +127,23 @@ Listeners validate message source and shape before acting:
 
 This reduces risk of untrusted page scripts spoofing extension-internal status messages.
 
+### Messaging channels
+
+- **Page script → content scripts:** `window.postMessage` with the `__csb`/`channel` envelope for status + alerts.
+- **Content scripts → page script:** Implicit via shared local storage updates that the page script reads on load.
+- **Extension runtime:** `chrome.runtime.onMessage` for popup/background ↔ content coordination.
+
 ### Shared settings normalization
 
 `src/config.js` provides a single `DEFAULT_SETTINGS` object and `normalizeSettings()` helper.
 These are reused by page/content/popup scripts to avoid drift in defaults and clamping rules.
+
+### Storage ownership
+
+- **`chrome.storage.sync`:** Source of truth for user settings (popup/background writes; content reads).
+- **`chrome.storage.local`:** Cached stats for popup display.
+- **`localStorage` (page origin):** Settings mirror for MAIN-world access and transient extra-messages state.
+- **`sessionStorage` (page origin):** Ephemeral navigation/scroll/status flags.
 
 
 ## CI & Permission Change Guard

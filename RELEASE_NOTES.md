@@ -6,6 +6,7 @@
 - Added ESLint for extension JavaScript with baseline safety rules.
 - Added CI workflow to run lint and manifest/package validation.
 - Added permission-widening guard that requires an explicit review note.
+- Documented context boundaries, messaging channels, and storage ownership in README.
 
 ---
 
