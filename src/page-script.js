@@ -127,7 +127,7 @@
     for (const id of keptRaw) queue.push({ id, depth: 0, parentIsSupport: false });
 
     while (queue.length > 0) {
-      const { id, depth, parentIsSupport } = queue.shift();
+      const { id, depth, parentIsSupport } = queue.pop();
       if (depth >= 3) continue;
       const node = mapping[id];
       if (!node) continue;
@@ -302,6 +302,8 @@
 
   let lastDispatchedStatus = null;
 
+  let lastStatusWrite = 0;
+
   function dispatchStatus(status) {
     if (lastDispatchedStatus) {
       const same =
@@ -323,10 +325,14 @@
     
     // Also persist to sessionStorage as backup for timing issues
     try {
-      sessionStorage.setItem("csb_last_status", JSON.stringify({
-        ...status,
-        url: window.location.href
-      }));
+      const now = Date.now();
+      if (now - lastStatusWrite > 2000) {
+        sessionStorage.setItem("csb_last_status", JSON.stringify({
+          ...status,
+          url: window.location.href
+        }));
+        lastStatusWrite = now;
+      }
     } catch (e) {
       // sessionStorage might not be available
     }

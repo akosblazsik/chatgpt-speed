@@ -110,7 +110,7 @@ function trimMapping(data, limit) {
   for (const id of keptRaw) queue.push({ id, depth: 0, parentIsSupport: false });
 
   while (queue.length > 0) {
-    const { id, depth, parentIsSupport } = queue.shift();
+    const { id, depth, parentIsSupport } = queue.pop();
     if (depth >= 3) continue;
     const node = mapping[id];
     if (!node) continue;

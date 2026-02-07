@@ -295,6 +295,8 @@
     log("Setting up scroll restore watcher");
     scrollRestoreRetryCount = 0;
 
+    const observeTarget = getMessagesContainer() || document.body;
+
     // Use MutationObserver to watch for message articles appearing
     scrollRestoreObserver = new MutationObserver((mutations, observer) => {
       // Look for article elements (messages)
@@ -313,7 +315,7 @@
     });
 
     // Start observing
-    scrollRestoreObserver.observe(document.body, {
+    scrollRestoreObserver.observe(observeTarget, {
       childList: true,
       subtree: true
     });

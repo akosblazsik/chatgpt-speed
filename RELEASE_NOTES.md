@@ -1,5 +1,14 @@
 # Release Notes
 
+## v1.0.5 — Additional performance tuning
+
+### ⚡ Performance improvements
+- Throttled `csb_last_status` sessionStorage writes.
+- Optimized support-node traversal (avoid `Array.shift`).
+- Scoped scroll-restore observer to message container.
+
+---
+
 ## v1.0.4 — Performance and stability improvements
 
 This release further reduces background work while keeping behavior unchanged.
