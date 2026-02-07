@@ -1,5 +1,17 @@
 # Release Notes
 
+## v1.0.2 — Performance optimizations (no behavior change)
+
+This release keeps 1.0.1 behavior, but reduces CPU/GC overhead.
+
+### ⚡ Performance improvements
+- Limit fetch interception to conversation endpoints only.
+- Skip trimming work when total turns are already within the limit.
+- Cache scroll container lookup to avoid repeated DOM traversal.
+- Replace periodic button polling with mutation-based reinsertion.
+
+---
+
 ## v1.0.1 — UI refresh, smarter trimming, and quality improvements
 
 This release improves both the popup experience and the conversation trimming engine.

@@ -391,7 +391,7 @@
 
   function isConversationRequest(method, url) {
     if (method !== "GET") return false;
-    if (!url.pathname.startsWith("/backend-api/")) return false;
+    if (!url.pathname.startsWith("/backend-api/conversation")) return false;
     return true;
   }
 
@@ -500,6 +500,17 @@
       const trimmed = trimMapping(json, cfg.messageLimit, extraMessages);
 
       if (!trimmed) {
+        return res;
+      }
+
+      if (trimmed.visibleTotal <= cfg.messageLimit + extraMessages) {
+        // Nothing to trim; keep original response to avoid extra work.
+        dispatchStatus({
+          totalMessages: trimmed.visibleTotal,
+          renderedMessages: trimmed.visibleTotal,
+          extraMessages: extraMessages,
+          hasOlderMessages: false
+        });
         return res;
       }
 

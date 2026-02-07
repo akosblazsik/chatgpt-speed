@@ -98,7 +98,12 @@
 
   // ---- Scroll Position Management ----
 
+  let cachedScrollContainer = null;
+
   function getScrollContainer() {
+    if (cachedScrollContainer && cachedScrollContainer.isConnected) {
+      return cachedScrollContainer;
+    }
     // ChatGPT uses various scroll containers - try multiple selectors
     const selectors = [
       // The main scrollable div inside the conversation
@@ -119,13 +124,15 @@
             const style = getComputedStyle(parent);
             if (style.overflowY === 'auto' || style.overflowY === 'scroll') {
               log("Found scroll container via article parent:", parent.className);
-              return parent;
+              cachedScrollContainer = parent;
+              return cachedScrollContainer;
             }
             parent = parent.parentElement;
           }
         } else {
           log("Found scroll container:", selector);
-          return el;
+          cachedScrollContainer = el;
+          return cachedScrollContainer;
         }
       }
     }
@@ -523,13 +530,11 @@
     }
   }
 
-  let buttonCheckInterval = null;
+  let buttonCheckObserver = null;
 
   function startButtonVisibilityChecker() {
-    if (buttonCheckInterval) return;
-    
-    buttonCheckInterval = setInterval(() => {
-      // If we should have a button but it's gone from DOM, re-insert it
+    if (buttonCheckObserver) return;
+    buttonCheckObserver = new MutationObserver(() => {
       if (hasOlderMessages) {
         if (!loadMoreButton || !loadMoreButton.isConnected) {
           log("Button missing from DOM - reinserting");
@@ -538,7 +543,8 @@
           insertButtonAtTop();
         }
       }
-    }, 3000); // Check every 3 seconds
+    });
+    buttonCheckObserver.observe(document.body, { childList: true, subtree: true });
   }
 
   function initialize() {
@@ -552,6 +558,8 @@
     }
 
     log("Initializing navigation at", Date.now());
+
+    cachedScrollContainer = null;
 
     // Listen for status updates from page-script via postMessage
     window.addEventListener("message", (event) => {
@@ -582,10 +590,11 @@
 
   function cleanup() {
     removeButton();
-    if (buttonCheckInterval) {
-      clearInterval(buttonCheckInterval);
-      buttonCheckInterval = null;
+    if (buttonCheckObserver) {
+      buttonCheckObserver.disconnect();
+      buttonCheckObserver = null;
     }
+    cachedScrollContainer = null;
   }
 
   // Export
