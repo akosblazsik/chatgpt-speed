@@ -1,88 +1,91 @@
-# ChatGPT Speed vs Chrome Extension Best Practices (MV3)
+# ChatGPT Speed vs Chrome Extension Best Practices (Manifest V3)
 
 Date: 2026-02-07
 
 ## Purpose
-This document compares the current repository state to widely accepted Chrome Extension Manifest V3 best practices, with direct evidence from source files and concrete follow-up actions.
+This document evaluates the current repository against practical Chrome extension best practices (MV3), highlights strong patterns already implemented, and identifies high-impact follow-up work.
 
 ## Executive Summary
 
-ChatGPT Speed is **largely aligned** with MV3 best practices for permission minimization, local-first processing, and context separation. The project also includes notable trust-boundary hardening (message envelope + origin/source checks) that many small extensions skip.
+ChatGPT Speed is in a **strong position** for a focused MV3 extension:
 
-Main opportunity areas are now operational rather than structural: automated lint/tests in CI, stricter schema validation for all runtime message payloads, and stronger release hygiene checks.
+- It uses a correct MV3 architecture with a service worker background and staged content scripts.
+- It keeps permissions narrow and host access tightly scoped to ChatGPT domains.
+- It has meaningful cross-context hardening (message envelope + source/origin checks + trusted runtime sender checks).
+- It includes local validation/tooling scripts for linting, manifest integrity, packaging sanity, and permission widening checks.
+
+Primary gaps are now **operational maturity** rather than core architecture: no repository CI workflow, no automated tests around critical message schema behavior, and no formal architecture note for contributor onboarding.
 
 ## Comparison Matrix
 
-| Area | Best-practice expectation | Current status | Assessment |
+| Area | Best-practice expectation | Current repository state | Assessment |
 |---|---|---|---|
-| Manifest & MV3 | MV3, service worker background, no persistent background page | Uses `manifest_version: 3` and a service worker background | ✅ Strong |
-| Permission minimization | Keep API + host permissions minimal and scoped | Uses `storage`, `activeTab`, and only ChatGPT host patterns | ✅ Strong |
-| Cross-context security | Validate message source/origin and namespace internal events | Validates `source`, `origin`, envelope, channel, and type for `window.message` | ✅ Strong |
-| Config consistency | One source of defaults + normalization shared by all contexts | `src/config.js` defines `DEFAULT_SETTINGS` and `normalizeSettings()` used across scripts | ✅ Strong |
-| Privacy posture | Local processing, no remote telemetry unless explicitly needed | README states local processing; core logic performs local trimming | ✅ Strong |
-| Reliability | Defensive coding around storage/runtime errors | Multiple guarded storage/runtime call sites and graceful fallbacks | ✅ Good |
-| Tooling & governance | Linting/testing/CI gates for regressions and security checks | No CI/lint config present in repository | ⚠️ Needs improvement |
+| MV3 architecture | Service worker background and no persistent background page | `manifest_version: 3` and `background.service_worker` are used | ✅ Strong |
+| Least privilege | Minimal extension permissions and narrowly scoped host permissions | `storage`, `activeTab`, and only `chat.openai.com` + `chatgpt.com` host patterns | ✅ Strong |
+| Cross-context messaging security | Validate trust boundary for `window.postMessage` + runtime messages | Uses namespaced envelope (`__csb`, `channel`), checks `event.source`, `event.origin`, and validates runtime sender identity | ✅ Strong |
+| Shared settings model | Centralized defaults/normalization reused across extension contexts | `src/config.js` shared by page/content/popup flows; local fallback paths exist | ✅ Good |
+| Privacy by design | Local-first processing, avoid unnecessary remote collection | Trimming logic runs in-browser; no telemetry pipeline implemented | ✅ Strong |
+| Quality gates | Lint + policy checks + release checks run automatically in CI | Local scripts exist (`lint`, `validate:manifest`, `validate:package`, `check:permissions`) but no `.github/workflows` gate yet | ⚠️ Needs improvement |
+| Maintainability | Clear architecture docs and contributor guardrails | Security posture is visible in code/docs, but architecture/trust-boundary guide is still implicit | ⚠️ Needs improvement |
 
 ## Detailed Findings
 
-### 1) MV3 architecture and execution-context design (Aligned)
-- The extension is explicitly MV3 and uses a service worker background script. 
-- Content scripts are phased (`document_start` for early config/bootstrap and MAIN-world patching, `document_idle` for UI/navigation behavior), which is appropriate for this extension’s fetch-intercept strategy.
+### 1) MV3 foundation and script lifecycle are well-designed
+The extension follows MV3 requirements and separates responsibilities across service worker, content scripts, and MAIN world script injection. This is aligned with Chrome's modern extension lifecycle and reduces legacy risk.
 
-**Why this is good:** it follows modern Chrome extension lifecycle constraints and avoids deprecated persistent background model.
+**Why it matters:** Correct context separation is the baseline for reliability and reviewability in MV3.
 
-## 2) Principle of least privilege (Aligned)
-- Host permissions are restricted to `https://chat.openai.com/*` and `https://chatgpt.com/*`.
-- Declared extension permissions are narrow (`storage`, `activeTab`).
+### 2) Permission minimization is handled correctly
+The project requests only `storage` and `activeTab`, and host permissions are constrained to two ChatGPT URL patterns.
 
-**Why this is good:** this reduces attack surface and improves Web Store review posture.
+**Why it matters:** Smaller permission surface improves user trust and lowers Web Store review friction.
 
-## 3) Trust boundaries and message hardening (Aligned, improved)
-- Cross-context status events use a namespaced envelope (`__csb`, `channel`, `type`, `payload`).
-- The content script listener rejects messages unless they come from the same `window` and same page origin.
-- Runtime message handling includes sender trust checks before responding.
+### 3) Messaging trust boundaries are stronger than average
+The repository uses a namespaced message envelope for page/content communication and applies strict listener filtering (`event.source`, `event.origin`, envelope fields). Runtime messages additionally validate sender trust with extension-id + origin/tab checks.
 
-**Why this is good:** prevents accidental acceptance of arbitrary in-page messages and reduces spoofing risk.
+**Why it matters:** This substantially reduces accidental message spoof acceptance and keeps privileged paths bounded.
 
-## 4) Shared settings normalization (Aligned)
-- Settings defaults and clamping are centralized in `src/config.js`.
-- Popup/content/page scripts consume the same normalization behavior.
+### 4) Config normalization is mostly centralized
+`DEFAULT_SETTINGS` and `normalizeSettings()` are shared, reducing drift risk across popup/content/page logic.
 
-**Why this is good:** avoids drift bugs and keeps limits/enums consistent (`messageLimit`, `maxExtraMessages`, `theme`).
+**Why it matters:** Shared normalization avoids subtle cross-context bugs in setting boundaries.
 
-## 5) Privacy-by-design posture (Aligned)
-- User-facing docs explicitly state local-only behavior.
-- Core behavior trims response payloads in-browser rather than transmitting conversation content elsewhere.
+### 5) Tooling exists, but automation around it is missing
+The repo includes practical validation scripts for linting, manifest/package checks, and permission widening. However, these protections rely on manual execution because no CI workflow is configured.
 
-**Why this is good:** aligns with user expectations and low-data-retention best practices.
+**Why it matters:** Best-practice controls only protect reliably when automated on every PR/release.
 
-## 6) Remaining gaps to reach “excellent”
+## High-Impact Recommendations
 
-### A. Missing automated quality/security gates (High priority)
-No repository-level lint/test/CI configuration is present. This raises regression risk for trust-boundary and permission-sensitive code.
+### Priority 1 — Add CI enforcement (highest ROI)
+Create a GitHub Actions workflow that runs:
 
-**Recommended next step:**
-1. Add ESLint for extension JS.
-2. Add a CI workflow that runs lint and a minimal manifest/package validation.
-3. Add a static check that forbids permission widening without explicit review note.
+1. `npm ci`
+2. `npm run ci:checks`
+3. `npm run check:permissions`
 
-### B. Schema strictness can be expanded (Medium)
-The most sensitive channels are already validated. Some runtime message shapes are type-checked but could benefit from strict schema validation helpers for all message types.
+This turns existing good scripts into consistent policy gates.
 
-**Recommended next step:**
-- Add tiny shared validators for each message type (runtime + window), returning typed/normalized payloads.
+### Priority 2 — Add focused tests for message schema and boundary checks
+Add lightweight unit-style tests for critical validators and envelope acceptance/rejection logic.
 
-### C. Release hardening opportunities (Low/Medium)
-Packaging guidance is documented, but automated release guardrails are still mostly manual.
+Suggested targets:
+- Runtime sender trust helper
+- `window.message` envelope acceptance logic
+- Config normalization clamping edge cases
 
-**Recommended next step:**
-- Add release checklist automation (manifest/release-note version coherence, package hash output, optional signed artifact metadata).
+### Priority 3 — Add an architecture/trust-boundary note
+Document context boundaries (popup/content/page/background), messaging channels, and storage ownership.
 
-## Suggested 30-day roadmap
-1. **Week 1:** Introduce ESLint + basic npm scripts and run on changed files.
-2. **Week 2:** Add GitHub Actions workflow for lint + manifest validation.
-3. **Week 3:** Add shared message schema validators and unit-like script checks.
-4. **Week 4:** Add release validation script (version consistency + package integrity output).
+This reduces regression risk when contributors modify fetch patching or messaging.
+
+## Suggested 30-Day Roadmap
+
+1. **Week 1:** Add CI workflow wiring to existing scripts.
+2. **Week 2:** Add validator-focused tests around message/schema pathways.
+3. **Week 3:** Add architecture + trust-boundary documentation section.
+4. **Week 4:** Tighten release checklist automation (version coherence and package integrity output).
 
 ## Bottom Line
-ChatGPT Speed currently sits in a **“good-to-very-good”** best-practices position for a focused MV3 extension, with most high-risk fundamentals already handled. The biggest lift now is not architecture rewrites, but automating safeguards so today’s strong posture remains stable as the code evolves.
+
+ChatGPT Speed is currently **well aligned** with Chrome extension MV3 best practices in its architecture, permissions, and security boundary handling. The main next step is to formalize and automate what is already good—primarily through CI and focused regression tests—so the current posture remains stable as the extension evolves.
