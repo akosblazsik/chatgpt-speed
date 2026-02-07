@@ -19,6 +19,7 @@
   const DEFAULT_CONFIG = {
     enabled: true,
     messageLimit: 15,
+    maxExtraMessages: 300,
     debug: false
   };
 
@@ -89,6 +90,16 @@
 
     // Calculate effective limit (base + extra)
     const effectiveLimit = Math.max(1, limit + extraMessages);
+
+    if (visibleTotal <= effectiveLimit) {
+      return {
+        noTrim: true,
+        totalCount: path.length,
+        visibleKept: visibleTotal,
+        visibleTotal,
+        hasOlderMessages: false
+      };
+    }
 
     // Determine cut index based on turn boundaries
     let cutIndex = 0;
@@ -247,6 +258,7 @@
         return {
           enabled: parsed.enabled ?? DEFAULT_CONFIG.enabled,
           messageLimit: Math.max(1, parsed.messageLimit ?? DEFAULT_CONFIG.messageLimit),
+          maxExtraMessages: parsed.maxExtraMessages ?? DEFAULT_CONFIG.maxExtraMessages,
           debug: parsed.debug ?? DEFAULT_CONFIG.debug
         };
       }
@@ -310,7 +322,8 @@
         lastDispatchedStatus.totalMessages === status.totalMessages &&
         lastDispatchedStatus.renderedMessages === status.renderedMessages &&
         lastDispatchedStatus.extraMessages === status.extraMessages &&
-        lastDispatchedStatus.hasOlderMessages === status.hasOlderMessages;
+        lastDispatchedStatus.hasOlderMessages === status.hasOlderMessages &&
+        lastDispatchedStatus.url === status.url;
       if (same) {
         return;
       }
@@ -509,11 +522,11 @@
         return res;
       }
 
-      if (trimmed.visibleTotal <= cfg.messageLimit + extraMessages) {
+      if (trimmed.noTrim) {
         // Nothing to trim; keep original response to avoid extra work.
         dispatchStatus({
           totalMessages: trimmed.visibleTotal,
-          renderedMessages: trimmed.visibleTotal,
+          renderedMessages: trimmed.visibleKept,
           extraMessages: extraMessages,
           hasOlderMessages: false
         });
@@ -570,7 +583,11 @@
     window.__CSB_PROXY_PATCHED__ = true;
     log("Fetch proxy installed");
 
-    window.postMessage({ type: "csb-proxy-ready" }, location.origin);
+    try {
+      window.postMessage({ type: "csb-proxy-ready" }, "*");
+    } catch {
+      // Ignore postMessage failures in early/opaque origins
+    }
   }
 
   function setupConfigListener() {
@@ -593,6 +610,7 @@
         window.__CSB_CONFIG__ = {
           enabled: config.enabled ?? DEFAULT_CONFIG.enabled,
           messageLimit: Math.max(1, config.messageLimit ?? DEFAULT_CONFIG.messageLimit),
+          maxExtraMessages: config.maxExtraMessages ?? DEFAULT_CONFIG.maxExtraMessages,
           debug: config.debug ?? DEFAULT_CONFIG.debug
         };
         log("Config updated:", window.__CSB_CONFIG__);

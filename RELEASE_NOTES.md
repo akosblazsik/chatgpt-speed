@@ -1,5 +1,18 @@
 # Release Notes
 
+## v1.0.6 — Stability and reliability fixes
+
+### 🛠️ Fixes
+- Prevented cross‑origin postMessage errors when the page is in an opaque origin state.
+- Ensure `maxExtraMessages` is read in the page script (settings sync reliability).
+- More resilient `maxExtraMessages` handling in navigation (invalid values fall back safely).
+- Reduced race risk when loading status from sessionStorage on navigation.
+
+### ⚡ Performance improvements
+- Skip heavy mapping rebuild when no trimming is required.
+
+---
+
 ## v1.0.5 — Additional performance tuning
 
 ### ⚡ Performance improvements

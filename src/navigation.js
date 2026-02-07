@@ -336,7 +336,11 @@
   function loadOlderMessages() {
     const limit = state.messageLimit || 10;
     const currentExtra = getExtraMessages();
-    const maxExtra = Math.max(0, state.maxExtraMessages ?? Math.max(50, limit * 20));
+    let maxExtra = state.maxExtraMessages;
+    if (typeof maxExtra !== "number" || Number.isNaN(maxExtra)) {
+      maxExtra = Math.max(50, limit * 20);
+    }
+    maxExtra = Math.max(0, maxExtra);
     
     // Calculate new messages added during this session
     let newMessages = 0;
@@ -498,7 +502,6 @@
     
     if (!status) return;
 
-    const hadOlderMessages = hasOlderMessages;
     hasOlderMessages = status.hasOlderMessages ?? false;
     
     // Safety check: Don't show button if total messages are less than or equal to rendered messages

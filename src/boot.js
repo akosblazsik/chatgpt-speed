@@ -155,6 +155,8 @@
   let performanceWarningShown = false;
   let checkDebounceTimer = null;
   let checkScheduled = false;
+  let pendingLastStatusTimer = null;
+  let pendingLastStatusUrl = null;
 
   /**
    * Count the number of visible message turns in the DOM.
@@ -335,6 +337,11 @@
       checkDebounceTimer = null;
     }
     checkScheduled = false;
+    if (pendingLastStatusTimer) {
+      clearTimeout(pendingLastStatusTimer);
+      pendingLastStatusTimer = null;
+    }
+    pendingLastStatusUrl = null;
     log("Message watcher state reset");
   }
 
@@ -561,6 +568,25 @@
             // Update navigation button
             if (booster.navigation && booster.navigation.updateButtonText) {
               booster.navigation.updateButtonText();
+            }
+          }
+        }
+        if (storedStatus) {
+          const status = JSON.parse(storedStatus);
+          if (status && status.url) {
+            pendingLastStatusUrl = status.url;
+            if (!pendingLastStatusTimer) {
+              pendingLastStatusTimer = setTimeout(() => {
+                try {
+                  if (pendingLastStatusUrl && window.location.href !== pendingLastStatusUrl) {
+                    sessionStorage.removeItem("csb_last_status");
+                  }
+                } catch (e) {
+                  // sessionStorage might not be available
+                }
+                pendingLastStatusTimer = null;
+                pendingLastStatusUrl = null;
+              }, 10000);
             }
           }
         }
