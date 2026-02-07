@@ -65,6 +65,41 @@ Click the extension icon to access:
 - **Debug Mode:** Enable detailed console logs for troubleshooting.
 - **Save Settings:** Refreshes the current ChatGPT tab after updating settings.
 
+
+## Architecture & Trust Boundaries
+
+ChatGPT Speed uses three execution contexts with different capabilities:
+
+1. **Page script (`src/page-script.js`, MAIN world):**
+   - Can patch `window.fetch` before ChatGPT app code runs.
+   - Does **not** use privileged extension APIs directly.
+2. **Content scripts (`src/page-inject.js`, `src/boot.js`, `src/navigation.js`, etc.):**
+   - Run in isolated extension world and can use `chrome.*` APIs.
+   - Bridge state between extension storage and the page runtime.
+3. **Extension UI/background (`src/popup.js`, `src/background.js`):**
+   - Store settings in `chrome.storage.sync` and render popup controls.
+
+### Messaging hardening
+
+Cross-context messages use a namespaced envelope:
+
+- `__csb: true`
+- `channel: "chatgpt-speed"`
+- `type` + typed `payload`
+
+Listeners validate message source and shape before acting:
+
+- `event.source === window`
+- `event.origin === window.location.origin`
+- required envelope fields and expected `type`
+
+This reduces risk of untrusted page scripts spoofing extension-internal status messages.
+
+### Shared settings normalization
+
+`src/config.js` provides a single `DEFAULT_SETTINGS` object and `normalizeSettings()` helper.
+These are reused by page/content/popup scripts to avoid drift in defaults and clamping rules.
+
 ## License
 
 This project is licensed under the MIT License. See `LICENSE`.

@@ -14,6 +14,16 @@
   const STORAGE_KEY = "csb_settings";
   const LOCAL_STORAGE_KEY = "csb_config";
 
+  const configApi = window.ChatGPTSpeedConfig;
+  const normalizeSettings = configApi?.normalizeSettings;
+  const defaults = configApi?.DEFAULT_SETTINGS || {
+    enabled: true,
+    messageLimit: 15,
+    maxExtraMessages: 300,
+    debug: false,
+    theme: "system"
+  };
+
   /**
    * Sync settings from browser.storage to localStorage.
    */
@@ -23,10 +33,12 @@
       const stored = result[STORAGE_KEY];
 
       if (stored) {
-        const config = {
-          enabled: stored.enabled ?? true,
-          messageLimit: stored.messageLimit ?? 10,
-          debug: stored.debug ?? false
+        const config = normalizeSettings ? normalizeSettings(stored) : {
+          enabled: stored.enabled ?? defaults.enabled,
+          messageLimit: stored.messageLimit ?? defaults.messageLimit,
+          maxExtraMessages: stored.maxExtraMessages ?? defaults.maxExtraMessages,
+          debug: stored.debug ?? defaults.debug,
+          theme: stored.theme ?? defaults.theme
         };
         localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(config));
       }
@@ -35,8 +47,5 @@
     }
   }
 
-  // Execute immediately:
-  // Start syncing settings (async)
-  // page-script.js is now loaded via manifest (world: MAIN)
   syncSettingsToLocalStorage();
 })();

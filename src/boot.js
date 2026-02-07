@@ -11,17 +11,31 @@
   // Storage keys
   const SETTINGS_KEY = "csb_settings";
   const LOCAL_STORAGE_KEY = "csb_config";
+  const MESSAGE_CHANNEL = "chatgpt-speed";
+
+  const configApi = window.ChatGPTSpeedConfig;
+  const normalizeSettings = configApi?.normalizeSettings;
+  const defaultSettings = configApi?.DEFAULT_SETTINGS || {
+    enabled: true,
+    messageLimit: 15,
+    maxExtraMessages: 300,
+    debug: false,
+    theme: "system"
+  };
 
   // ---- Settings sync to localStorage (for page-script access) -----------
 
   function syncSettingsToLocalStorage(settings) {
     try {
-      const cfg = {
-        enabled: settings.enabled ?? true,
-        messageLimit: settings.messageLimit ?? 10,
-        maxExtraMessages: settings.maxExtraMessages ?? 300,
-        debug: settings.debug ?? false
-      };
+      const cfg = normalizeSettings
+        ? normalizeSettings(settings)
+        : {
+            enabled: settings.enabled ?? defaultSettings.enabled,
+            messageLimit: settings.messageLimit ?? defaultSettings.messageLimit,
+            maxExtraMessages: settings.maxExtraMessages ?? defaultSettings.maxExtraMessages,
+            debug: settings.debug ?? defaultSettings.debug,
+            theme: settings.theme ?? defaultSettings.theme
+          };
       localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(cfg));
 
       // Also dispatch event for page-script if it's already running
@@ -38,12 +52,14 @@
   // ---- Storage: enabled + debug flags -----------------------------------
 
   function initializeStorageListeners() {
-    chrome.storage.sync.get({ [SETTINGS_KEY]: { enabled: true, messageLimit: 15, maxExtraMessages: 300, debug: false } }, (data) => {
-      const settings = data[SETTINGS_KEY];
+    chrome.storage.sync.get({ [SETTINGS_KEY]: defaultSettings }, (data) => {
+      const settings = normalizeSettings
+        ? normalizeSettings(data[SETTINGS_KEY])
+        : data[SETTINGS_KEY];
       state.enabled = settings.enabled;
       state.debug = settings.debug;
       state.messageLimit = settings.messageLimit;
-      state.maxExtraMessages = settings.maxExtraMessages ?? 300;
+      state.maxExtraMessages = settings.maxExtraMessages;
 
       // Sync to localStorage for page-script
       syncSettingsToLocalStorage(settings);
@@ -67,11 +83,13 @@
       if (areaName !== "sync") return;
 
       if (changes[SETTINGS_KEY]) {
-        const settings = changes[SETTINGS_KEY].newValue;
+        const settings = normalizeSettings
+          ? normalizeSettings(changes[SETTINGS_KEY].newValue)
+          : changes[SETTINGS_KEY].newValue;
         state.enabled = settings.enabled;
         state.debug = settings.debug;
         state.messageLimit = settings.messageLimit;
-        state.maxExtraMessages = settings.maxExtraMessages ?? 300;
+        state.maxExtraMessages = settings.maxExtraMessages;
 
         // Sync to localStorage
         syncSettingsToLocalStorage(settings);
@@ -113,11 +131,22 @@
   function setupStatusListener() {
     // Listen for status updates from page-script via postMessage (cross-context)
     window.addEventListener("message", (event) => {
-      if (!event.data || !event.data.type) return;
+      const data = event.data;
+      if (
+        event.source !== window ||
+        event.origin !== window.location.origin ||
+        !data ||
+        typeof data !== "object" ||
+        data.__csb !== true ||
+        data.channel !== MESSAGE_CHANNEL ||
+        typeof data.type !== "string"
+      ) {
+        return;
+      }
       
       // Handle status updates
-      if (event.data.type === "csb-status") {
-        const status = event.data.payload;
+      if (data.type === "csb-status") {
+        const status = data.payload;
         if (status && typeof status === "object") {
           state.stats.totalMessages = status.totalMessages || 0;
           state.stats.renderedMessages = status.renderedMessages || 0;
@@ -140,8 +169,8 @@
       }
       
       // Handle performance warning
-      if (event.data.type === "csb-performance-warning") {
-        showPerformanceWarning(event.data.payload);
+      if (data.type === "csb-performance-warning") {
+        showPerformanceWarning(data.payload);
       }
     });
   }

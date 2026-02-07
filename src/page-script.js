@@ -15,13 +15,18 @@
 
   const LOCAL_STORAGE_KEY = "csb_config";
   const EXTRA_MESSAGES_KEY = "csb_extra_messages";
+  const MESSAGE_CHANNEL = "chatgpt-speed";
 
-  const DEFAULT_CONFIG = {
+  const configApi = window.ChatGPTSpeedConfig;
+  const normalizeSettings = configApi?.normalizeSettings;
+
+  const DEFAULT_CONFIG = (configApi?.DEFAULT_SETTINGS || {
     enabled: true,
     messageLimit: 15,
     maxExtraMessages: 300,
-    debug: false
-  };
+    debug: false,
+    theme: "system"
+  });
 
   // Track turns since load for performance warning feature
   let turnsSinceRefresh = 0;
@@ -255,17 +260,21 @@
       const stored = localStorage.getItem(LOCAL_STORAGE_KEY);
       if (stored) {
         const parsed = JSON.parse(stored);
+        if (normalizeSettings) {
+          return normalizeSettings(parsed);
+        }
         return {
           enabled: parsed.enabled ?? DEFAULT_CONFIG.enabled,
           messageLimit: Math.max(1, parsed.messageLimit ?? DEFAULT_CONFIG.messageLimit),
           maxExtraMessages: parsed.maxExtraMessages ?? DEFAULT_CONFIG.maxExtraMessages,
-          debug: parsed.debug ?? DEFAULT_CONFIG.debug
+          debug: parsed.debug ?? DEFAULT_CONFIG.debug,
+          theme: parsed.theme ?? DEFAULT_CONFIG.theme
         };
       }
     } catch {
       // Fallback to defaults
     }
-    return DEFAULT_CONFIG;
+    return normalizeSettings ? normalizeSettings(DEFAULT_CONFIG) : DEFAULT_CONFIG;
   }
 
   function getConfig() {
@@ -332,9 +341,11 @@
 
     // Use postMessage to communicate with content script (across context boundary)
     window.postMessage({
+      __csb: true,
+      channel: MESSAGE_CHANNEL,
       type: "csb-status",
       payload: status
-    }, "*");
+    }, window.location.origin);
     
     // Also persist to sessionStorage as backup for timing issues
     try {
@@ -394,12 +405,14 @@
         performanceWarningShown = true;
         log("Performance warning triggered - dispatching via postMessage");
         window.postMessage({
+          __csb: true,
+          channel: MESSAGE_CHANNEL,
           type: "csb-performance-warning",
           payload: {
             turnsSinceRefresh: turnsSinceRefresh,
             limit: limit
           }
-        }, "*");
+        }, window.location.origin);
       }
     }
   }
@@ -584,7 +597,11 @@
     log("Fetch proxy installed");
 
     try {
-      window.postMessage({ type: "csb-proxy-ready" }, "*");
+      window.postMessage({
+        __csb: true,
+        channel: MESSAGE_CHANNEL,
+        type: "csb-proxy-ready"
+      }, window.location.origin);
     } catch {
       // Ignore postMessage failures in early/opaque origins
     }
@@ -607,12 +624,15 @@
 
       if (config && typeof config === "object") {
         window.__CSB_DEBUG__ = config.debug ?? false;
-        window.__CSB_CONFIG__ = {
-          enabled: config.enabled ?? DEFAULT_CONFIG.enabled,
-          messageLimit: Math.max(1, config.messageLimit ?? DEFAULT_CONFIG.messageLimit),
-          maxExtraMessages: config.maxExtraMessages ?? DEFAULT_CONFIG.maxExtraMessages,
-          debug: config.debug ?? DEFAULT_CONFIG.debug
-        };
+        window.__CSB_CONFIG__ = normalizeSettings
+          ? normalizeSettings(config)
+          : {
+              enabled: config.enabled ?? DEFAULT_CONFIG.enabled,
+              messageLimit: Math.max(1, config.messageLimit ?? DEFAULT_CONFIG.messageLimit),
+              maxExtraMessages: config.maxExtraMessages ?? DEFAULT_CONFIG.maxExtraMessages,
+              debug: config.debug ?? DEFAULT_CONFIG.debug,
+              theme: config.theme ?? DEFAULT_CONFIG.theme
+            };
         log("Config updated:", window.__CSB_CONFIG__);
       }
     });

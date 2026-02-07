@@ -16,6 +16,7 @@
   const NAV_FLAG_KEY = "csb_navigating";
   const SCROLL_RESTORE_KEY = "csb_scroll_restore";
   const NAV_ATTRIBUTE = "data-csb-navigation";
+  const MESSAGE_CHANNEL = "chatgpt-speed";
 
   let loadMoreButton = null;
   let hasOlderMessages = false;
@@ -574,9 +575,19 @@
 
     // Listen for status updates from page-script via postMessage
     window.addEventListener("message", (event) => {
-      if (event.data && event.data.type === "csb-status") {
-        handleStatusUpdate(event.data.payload);
+      const data = event.data;
+      if (
+        event.source !== window ||
+        event.origin !== window.location.origin ||
+        !data ||
+        typeof data !== "object" ||
+        data.__csb !== true ||
+        data.channel !== MESSAGE_CHANNEL ||
+        data.type !== "csb-status"
+      ) {
+        return;
       }
+      handleStatusUpdate(data.payload);
     });
 
     // Try to insert button once page settles

@@ -17,11 +17,13 @@ FILES=(
   manifest.json
   src
   assets/icons
+  assets/Screenshot.png
   LICENSE
   THIRD_PARTY_LICENSES.md
   privacy-policy.md
   README.md
   RELEASE_NOTES.md
+  docs
 )
 
 INCLUDE=()
@@ -38,7 +40,7 @@ fi
 
 (
   cd "$ROOT_DIR"
-  zip -r "$OUT" "${INCLUDE[@]}" -x "*.DS_Store"
+  zip -r "$OUT" "${INCLUDE[@]}" -x "*.DS_Store" "assets/source-icons/*" "*.xcf" "*.zip"
 )
 
 echo "Created: $OUT"

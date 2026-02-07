@@ -18,6 +18,16 @@ document.addEventListener("DOMContentLoaded", () => {
   const SETTINGS_KEY = "csb_settings";
   const STATS_CACHE_KEY = "csb_cachedStats";
 
+  const configApi = window.ChatGPTSpeedConfig;
+  const normalizeSettings = configApi?.normalizeSettings;
+  const defaultSettings = configApi?.DEFAULT_SETTINGS || {
+    enabled: true,
+    messageLimit: 15,
+    maxExtraMessages: 300,
+    debug: false,
+    theme: "system"
+  };
+
   /**
    * Update status text and styling based on enabled state.
    */
@@ -61,13 +71,21 @@ document.addEventListener("DOMContentLoaded", () => {
    * Save settings to storage and sync to localStorage for page-script.
    */
   function saveSettings() {
-    const settings = {
-      enabled: toggleEnabledEl.checked,
-      messageLimit: parseInt(messageLimitEl.value, 10) || 10,
-      maxExtraMessages: parseInt(maxExtraMessagesEl.value, 10) || 300,
-      debug: toggleDebugEl.checked,
-      theme: themeModeEl.value
-    };
+    const settings = normalizeSettings
+      ? normalizeSettings({
+          enabled: toggleEnabledEl.checked,
+          messageLimit: messageLimitEl.value,
+          maxExtraMessages: maxExtraMessagesEl.value,
+          debug: toggleDebugEl.checked,
+          theme: themeModeEl.value
+        })
+      : {
+          enabled: toggleEnabledEl.checked,
+          messageLimit: parseInt(messageLimitEl.value, 10) || defaultSettings.messageLimit,
+          maxExtraMessages: parseInt(maxExtraMessagesEl.value, 10) || defaultSettings.maxExtraMessages,
+          debug: toggleDebugEl.checked,
+          theme: themeModeEl.value
+        };
 
     chrome.storage.sync.set({ [SETTINGS_KEY]: settings });
 
@@ -100,9 +118,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Load initial settings from storage
   chrome.storage.sync.get(
-    { [SETTINGS_KEY]: { enabled: true, messageLimit: 15, maxExtraMessages: 300, debug: false, theme: "system" } },
+    { [SETTINGS_KEY]: defaultSettings },
     (data) => {
-    const settings = data[SETTINGS_KEY];
+    const settings = normalizeSettings ? normalizeSettings(data[SETTINGS_KEY]) : data[SETTINGS_KEY];
     debugEnabled = settings.debug;
     toggleEnabledEl.checked = settings.enabled;
     messageLimitEl.value = settings.messageLimit;

@@ -1,5 +1,16 @@
 # Release Notes
 
+## v1.0.9 — Message validation + shared config
+
+### 🔒 Security & reliability
+- Hardened page↔content message handling with strict envelopes and source/origin validation.
+- Normalized settings via shared defaults + clamping across page script, boot, and popup.
+
+### 🧭 Documentation
+- Added Architecture & Trust Boundaries details for the messaging model and config flow.
+
+---
+
 ## v1.0.8 — Ownership and metadata updates
 
 ### 🛠️ Updates
