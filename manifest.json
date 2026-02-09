@@ -1,9 +1,10 @@
 {
    "action": {
       "default_icon": {
-         "16": "assets/icons/icon16.png",
-         "48": "assets/icons/icon48.png",
-         "128": "assets/icons/icon128.png"
+         "16": "assets/icons/16.png",
+         "32": "assets/icons/32.png",
+         "48": "assets/icons/48.png",
+         "128": "assets/icons/128.png"
       },
       "default_popup": "src/popup.html",
       "default_title": "ChatGPT Speed"
@@ -57,19 +58,21 @@
    ],
    "homepage_url": "https://github.com/akosblazsik/chatgpt-speed",
    "icons": {
-      "16": "assets/icons/icon16.png",
-      "48": "assets/icons/icon48.png",
-      "128": "assets/icons/icon128.png"
+      "16": "assets/icons/16.png",
+      "32": "assets/icons/32.png",
+      "48": "assets/icons/48.png",
+      "128": "assets/icons/128.png"
    },
    "manifest_version": 3,
    "minimum_chrome_version": "110",
    "name": "ChatGPT Speed - Make long ChatGPT threads fast again.",
    "permissions": [
       "storage",
-      "activeTab"
+      "activeTab",
+      "offscreen"
    ],
    "update_url": "https://clients2.google.com/service/update2/crx",
-  "version": "1.0.13",
-  "version_name": "1.0.13",
+  "version": "1.0.15",
+  "version_name": "1.0.15",
    "web_accessible_resources": []
 }

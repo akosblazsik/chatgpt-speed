@@ -1,5 +1,20 @@
 # Release Notes
 
+## v1.0.15 — Theme-aware action icons
+
+### 🎨 Branding
+- Added light/dark action icon switching, tied to popup theme or system theme.
+- Reserved full-color 16/32/48/128 icons for manifest usage.
+
+---
+
+## v1.0.14 — Icon refresh
+
+### 🎨 Branding
+- Updated extension icons to the new 16/48/128 assets.
+
+---
+
 ## v1.0.13 — Tooling and CI checks
 
 ### 🛠️ Maintenance

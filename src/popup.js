@@ -67,6 +67,15 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  function syncIconThemePreference(theme) {
+    chrome.runtime.sendMessage({
+      type: "setIconThemePreference",
+      theme
+    }).catch(() => {
+      // Service worker may be inactive.
+    });
+  }
+
   /**
    * Save settings to storage and sync to localStorage for page-script.
    */
@@ -129,6 +138,7 @@ document.addEventListener("DOMContentLoaded", () => {
     themeModeEl.value = settings.theme || "system";
     updateStatusText(settings.enabled);
     applyTheme(themeModeEl.value);
+    syncIconThemePreference(themeModeEl.value);
   });
 
   // Handle enabled toggle change
@@ -165,6 +175,7 @@ document.addEventListener("DOMContentLoaded", () => {
   themeModeEl.addEventListener("change", () => {
     applyTheme(themeModeEl.value);
     saveSettings();
+    syncIconThemePreference(themeModeEl.value);
   });
 
   // Handle refresh button
