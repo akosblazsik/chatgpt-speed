@@ -1,5 +1,19 @@
 # Release Notes
 
+## v1.0.16 — Navigation button theme support
+
+### 🎨 UI
+- Made the “Load previous messages” button adapt to light/dark themes.
+- Added live theme-change tracking so the button updates without reloads.
+
+### 📷 Store assets
+- Refreshed light/dark Chrome Web Store screenshots.
+
+### 🧾 Documentation
+- Added Chrome Web Store description and privacy copy.
+
+---
+
 ## v1.0.15 — Theme-aware action icons
 
 ### 🎨 Branding

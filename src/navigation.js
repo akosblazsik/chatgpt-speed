@@ -21,6 +21,9 @@
   let loadMoreButton = null;
   let hasOlderMessages = false;
   let buttonInserted = false;
+  let themeObserver = null;
+  let themeMediaQuery = null;
+  let themeMediaHandler = null;
 
   // ---- State Management ----
 
@@ -412,25 +415,29 @@
       alignItems: "center",
       justifyContent: "center",
       padding: "8px 16px",
-      borderRadius: "6px",
+      borderRadius: "9999px",
       fontSize: "13px",
       fontWeight: "400",
-      color: "#ececf1",
-      background: "#343541",
-      border: "1px solid #565869",
+      color: "#ffffff",
+      background: "#303030",
+      border: "none",
       boxShadow: "0 1px 2px rgba(0,0,0,0.1)",
       cursor: "pointer",
-      transition: "background 150ms ease",
+      transition: "background 150ms ease, color 150ms ease, border-color 150ms ease",
       fontFamily: "inherit"
     });
 
     button.addEventListener("mouseenter", () => {
-      button.style.background = "#40414f";
+      button.style.background = button.dataset.csbHoverBg || "#ffffff";
+      button.style.color = button.dataset.csbHoverColor || "#303030";
     });
 
     button.addEventListener("mouseleave", () => {
-      button.style.background = "#343541";
+      button.style.background = button.dataset.csbBaseBg || "#303030";
+      button.style.color = button.dataset.csbBaseColor || "#ffffff";
     });
+
+    applyButtonTheme(button);
 
     button.addEventListener("click", loadOlderMessages);
     
@@ -493,6 +500,89 @@
          log("Updated button text");
       }
     }
+  }
+
+  // ---- Theme Handling ----
+
+  function getThemeMode() {
+    const root = document.documentElement;
+    const dataTheme = root.getAttribute("data-theme");
+    if (dataTheme === "dark" || dataTheme === "light") {
+      return dataTheme;
+    }
+    if (root.classList.contains("dark")) {
+      return "dark";
+    }
+    if (root.classList.contains("light")) {
+      return "light";
+    }
+    if (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) {
+      return "dark";
+    }
+    return "light";
+  }
+
+  function applyButtonTheme(button) {
+    const theme = getThemeMode();
+    const themeStyles = theme === "dark"
+      ? {
+          baseBg: "#303030",
+          baseColor: "#ffffff",
+          hoverBg: "#ffffff",
+          hoverColor: "#303030",
+          borderColor: "transparent",
+          boxShadow: "0 1px 2px rgba(0,0,0,0.2)"
+        }
+      : {
+          baseBg: "#f3f4f6",
+          baseColor: "#111827",
+          hoverBg: "#111827",
+          hoverColor: "#f9fafb",
+          borderColor: "transparent",
+          boxShadow: "0 1px 2px rgba(17,24,39,0.08)"
+        };
+
+    button.style.background = themeStyles.baseBg;
+    button.style.color = themeStyles.baseColor;
+    button.style.borderColor = themeStyles.borderColor;
+    button.style.boxShadow = themeStyles.boxShadow;
+
+    button.dataset.csbTheme = theme;
+    button.dataset.csbBaseBg = themeStyles.baseBg;
+    button.dataset.csbBaseColor = themeStyles.baseColor;
+    button.dataset.csbHoverBg = themeStyles.hoverBg;
+    button.dataset.csbHoverColor = themeStyles.hoverColor;
+  }
+
+  function updateButtonThemeIfPresent() {
+    if (loadMoreButton && loadMoreButton.isConnected) {
+      const btn = loadMoreButton.querySelector("button");
+      if (btn) {
+        applyButtonTheme(btn);
+      }
+    }
+  }
+
+  function setupThemeWatcher() {
+    if (themeObserver || themeMediaQuery) return;
+
+    if (window.matchMedia) {
+      themeMediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+      themeMediaHandler = () => updateButtonThemeIfPresent();
+      if (typeof themeMediaQuery.addEventListener === "function") {
+        themeMediaQuery.addEventListener("change", themeMediaHandler);
+      } else if (typeof themeMediaQuery.addListener === "function") {
+        themeMediaQuery.addListener(themeMediaHandler);
+      }
+    }
+
+    themeObserver = new MutationObserver(() => {
+      updateButtonThemeIfPresent();
+    });
+    themeObserver.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class", "data-theme"]
+    });
   }
 
 
@@ -572,6 +662,7 @@
     log("Initializing navigation at", Date.now());
 
     cachedScrollContainer = null;
+    setupThemeWatcher();
 
     // Listen for status updates from page-script via postMessage
     window.addEventListener("message", (event) => {
@@ -615,6 +706,19 @@
     if (buttonCheckObserver) {
       buttonCheckObserver.disconnect();
       buttonCheckObserver = null;
+    }
+    if (themeObserver) {
+      themeObserver.disconnect();
+      themeObserver = null;
+    }
+    if (themeMediaQuery) {
+      if (typeof themeMediaQuery.removeEventListener === "function") {
+        themeMediaQuery.removeEventListener("change", themeMediaHandler);
+      } else if (typeof themeMediaQuery.removeListener === "function") {
+        themeMediaQuery.removeListener(themeMediaHandler);
+      }
+      themeMediaQuery = null;
+      themeMediaHandler = null;
     }
     cachedScrollContainer = null;
   }
