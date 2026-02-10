@@ -1,5 +1,13 @@
 # Release Notes
 
+## v1.0.17 — Header badges + shorter warning copy
+
+### 🎨 UI
+- Moved status badges into the page header (next to the model selector).
+- Shortened performance warning copy for better fit.
+
+---
+
 ## v1.0.16 — Navigation button theme support
 
 ### 🎨 UI

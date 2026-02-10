@@ -8,6 +8,35 @@
   const BADGE_ATTRIBUTE = "data-chatgpt-speed-booster-badge";
   const REFRESH_BADGE_ATTRIBUTE = "data-chatgpt-speed-booster-refresh-badge";
   const AUTO_REFRESH_FLAG = "csb_auto_refreshed";
+  const HEADER_BADGES_ATTRIBUTE = "data-csb-header-badges";
+
+  function getHeaderBadgeContainer() {
+    const header = document.querySelector("header#page-header");
+    if (!header) return null;
+
+    let container = header.querySelector(`[${HEADER_BADGES_ATTRIBUTE}]`);
+    if (container) return container;
+
+    container = document.createElement("div");
+    container.setAttribute(HEADER_BADGES_ATTRIBUTE, "1");
+    Object.assign(container.style, {
+      display: "inline-flex",
+      alignItems: "center",
+      gap: "8px",
+      marginLeft: "8px",
+      pointerEvents: "auto",
+      whiteSpace: "nowrap"
+    });
+
+    const modelButton = header.querySelector('[data-testid="model-switcher-dropdown-button"]');
+    if (modelButton && modelButton.parentElement) {
+      modelButton.parentElement.insertAdjacentElement("afterend", container);
+    } else {
+      header.appendChild(container);
+    }
+
+    return container;
+  }
 
   /**
    * Show a small badge near the chat input.
@@ -28,48 +57,59 @@
     // Icon + text
     badge.innerHTML = `<span style="margin-right:4px">${icon}</span><span>${text}</span>`;
 
-    // Find chat input to position relative to it
-    const inputEl = document.querySelector("#prompt-textarea");
-    let targetEl = inputEl;
+    const headerContainer = getHeaderBadgeContainer();
+    let posStyles = {};
+    if (headerContainer) {
+      posStyles = {
+        position: "relative",
+        left: "auto",
+        right: "auto",
+        top: "auto",
+        bottom: "auto"
+      };
+    } else {
+      // Find chat input to position relative to it
+      const inputEl = document.querySelector("#prompt-textarea");
+      let targetEl = inputEl;
 
-    if (inputEl) {
-      const wrapper = inputEl.closest('[class*="bg-token-bg-primary"]') || inputEl.closest("form");
-      if (wrapper) targetEl = wrapper;
-    }
-
-    let posStyles = {
-      position: "fixed",
-      left: "20px",
-      bottom: `${150 + stackOffset}px`
-    };
-
-    if (targetEl) {
-      const rect = targetEl.getBoundingClientRect();
-      let bottomVal = window.innerHeight - rect.top + 10 + stackOffset;
+      if (inputEl) {
+        const wrapper = inputEl.closest('[class*="bg-token-bg-primary"]') || inputEl.closest("form");
+        if (wrapper) targetEl = wrapper;
+      }
 
       posStyles = {
         position: "fixed",
-        left: `${rect.left}px`,
-        bottom: `${bottomVal}px`,
-        top: "auto",
-        right: "auto"
+        left: "20px",
+        bottom: `${150 + stackOffset}px`
       };
+
+      if (targetEl) {
+        const rect = targetEl.getBoundingClientRect();
+        let bottomVal = window.innerHeight - rect.top + 10 + stackOffset;
+
+        posStyles = {
+          position: "fixed",
+          left: `${rect.left}px`,
+          bottom: `${bottomVal}px`,
+          top: "auto",
+          right: "auto"
+        };
+      }
     }
 
     Object.assign(badge.style, {
       ...posStyles,
-      zIndex: "9999",
       display: "inline-flex",
       alignItems: "center",
       justifyContent: "center",
       gap: "4px",
-      padding: "5px 12px",
+      padding: headerContainer ? "4px 10px" : "5px 12px",
       borderRadius: "999px",
-      fontSize: "14px",
+      fontSize: headerContainer ? "12px" : "14px",
       fontWeight: "500",
       color: "#ffffff",
       background: "linear-gradient(135deg, #069b76, #13b58f)",
-      boxShadow: "0 6px 18px rgba(15, 23, 42, 0.35)",
+      boxShadow: headerContainer ? "0 2px 8px rgba(15, 23, 42, 0.25)" : "0 6px 18px rgba(15, 23, 42, 0.35)",
       backdropFilter: "blur(8px)",
       WebkitBackdropFilter: "blur(8px)",
       pointerEvents: "none",
@@ -78,7 +118,12 @@
       transition: "opacity 180ms ease-out, transform 180ms ease-out, filter 180ms ease-out"
     });
 
-    document.body.appendChild(badge);
+    if (headerContainer) {
+      headerContainer.appendChild(badge);
+    } else {
+      badge.style.zIndex = "9999";
+      document.body.appendChild(badge);
+    }
 
     // Slide in
     requestAnimationFrame(() => {

@@ -430,57 +430,91 @@
     const badge = document.createElement("div");
     badge.id = "csb-performance-warning-badge";
     
-    // Find chat input to position relative to it (same as other badges)
-    const inputEl = document.querySelector("#prompt-textarea");
-    let targetEl = inputEl;
-
-    if (inputEl) {
-      const wrapper = inputEl.closest('[class*="bg-token-bg-primary"]') || inputEl.closest("form");
-      if (wrapper) targetEl = wrapper;
+    const header = document.querySelector("header#page-header");
+    let headerContainer = null;
+    if (header) {
+      headerContainer = header.querySelector('[data-csb-header-badges]');
+      if (!headerContainer) {
+        headerContainer = document.createElement("div");
+        headerContainer.setAttribute("data-csb-header-badges", "1");
+        Object.assign(headerContainer.style, {
+          display: "inline-flex",
+          alignItems: "center",
+          gap: "8px",
+          marginLeft: "8px",
+          pointerEvents: "auto",
+          whiteSpace: "nowrap"
+        });
+        const modelButton = header.querySelector('[data-testid="model-switcher-dropdown-button"]');
+        if (modelButton && modelButton.parentElement) {
+          modelButton.parentElement.insertAdjacentElement("afterend", headerContainer);
+        } else {
+          header.appendChild(headerContainer);
+        }
+      }
     }
 
-    let posStyles = {
-      position: "fixed",
-      left: "20px",
-      bottom: "150px"
-    };
+    let posStyles = {};
+    if (headerContainer) {
+      posStyles = {
+        position: "relative",
+        left: "auto",
+        right: "auto",
+        top: "auto",
+        bottom: "auto"
+      };
+    } else {
+      // Find chat input to position relative to it (fallback)
+      const inputEl = document.querySelector("#prompt-textarea");
+      let targetEl = inputEl;
 
-    if (targetEl) {
-      const rect = targetEl.getBoundingClientRect();
-      const bottomVal = window.innerHeight - rect.top + 10;
+      if (inputEl) {
+        const wrapper = inputEl.closest('[class*="bg-token-bg-primary"]') || inputEl.closest("form");
+        if (wrapper) targetEl = wrapper;
+      }
+
       posStyles = {
         position: "fixed",
-        left: `${rect.left}px`,
-        bottom: `${bottomVal}px`,
-        top: "auto",
-        right: "auto"
+        left: "20px",
+        bottom: "150px"
       };
+
+      if (targetEl) {
+        const rect = targetEl.getBoundingClientRect();
+        const bottomVal = window.innerHeight - rect.top + 10;
+        posStyles = {
+          position: "fixed",
+          left: `${rect.left}px`,
+          bottom: `${bottomVal}px`,
+          top: "auto",
+          right: "auto"
+        };
+      }
     }
 
     Object.assign(badge.style, {
       ...posStyles,
       background: "linear-gradient(135deg, #ff9500, #ff5e3a)",
       color: "#fff",
-      padding: "10px 16px",
-      borderRadius: "10px",
-      boxShadow: "0 4px 20px rgba(0,0,0,0.3)",
-      zIndex: "9999",
+      padding: headerContainer ? "6px 10px" : "10px 16px",
+      borderRadius: headerContainer ? "8px" : "10px",
+      boxShadow: headerContainer ? "0 2px 8px rgba(0,0,0,0.25)" : "0 4px 20px rgba(0,0,0,0.3)",
       fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
-      fontSize: "13px",
+      fontSize: headerContainer ? "12px" : "13px",
       fontWeight: "500",
       display: "inline-flex",
       alignItems: "center",
       gap: "8px",
       cursor: "pointer",
       transition: "transform 0.2s ease, opacity 0.3s ease",
-      maxWidth: "400px"
+      maxWidth: headerContainer ? "280px" : "400px"
     });
     
     const messageCount = detail?.turnsSinceRefresh || "many";
     
     badge.innerHTML = `
       <span>💡</span>
-      <span>You've added ${messageCount} new messages. If performance becomes slow, <strong>refresh the page</strong> to restore speed!</span>
+      <span>${messageCount} new messages. <strong>Refresh</strong> for speed!</span>
     `;
     
     badge.addEventListener("mouseenter", () => {
@@ -498,7 +532,12 @@
     
     badge.addEventListener("click", dismissBadge);
     
-    document.body.appendChild(badge);
+    if (headerContainer) {
+      headerContainer.appendChild(badge);
+    } else {
+      badge.style.zIndex = "9999";
+      document.body.appendChild(badge);
+    }
     log("Performance warning badge shown");
     
     // Auto-dismiss after 7 seconds
