@@ -10,6 +10,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const toggleDebugEl = document.getElementById("toggleDebug");
   const messageLimitEl = document.getElementById("messageLimit");
   const maxExtraMessagesEl = document.getElementById("maxExtraMessages");
+  const toggleAutoRefreshEl = document.getElementById("toggleAutoRefresh");
+  const autoRefreshAfterEl = document.getElementById("autoRefreshAfter");
   const refreshBtn = document.getElementById("refreshBtn");
   const themeModeEl = document.getElementById("themeMode");
   let debugEnabled = false;
@@ -24,9 +26,15 @@ document.addEventListener("DOMContentLoaded", () => {
     enabled: true,
     messageLimit: 15,
     maxExtraMessages: 300,
+    autoRefreshEnabled: false,
+    autoRefreshAfter: 15,
     debug: false,
     theme: "system"
   };
+
+  function updateAutoRefreshInputState() {
+    autoRefreshAfterEl.disabled = !toggleAutoRefreshEl.checked;
+  }
 
   /**
    * Update status text and styling based on enabled state.
@@ -85,6 +93,8 @@ document.addEventListener("DOMContentLoaded", () => {
           enabled: toggleEnabledEl.checked,
           messageLimit: messageLimitEl.value,
           maxExtraMessages: maxExtraMessagesEl.value,
+          autoRefreshEnabled: toggleAutoRefreshEl.checked,
+          autoRefreshAfter: autoRefreshAfterEl.value,
           debug: toggleDebugEl.checked,
           theme: themeModeEl.value
         })
@@ -92,6 +102,8 @@ document.addEventListener("DOMContentLoaded", () => {
           enabled: toggleEnabledEl.checked,
           messageLimit: parseInt(messageLimitEl.value, 10) || defaultSettings.messageLimit,
           maxExtraMessages: parseInt(maxExtraMessagesEl.value, 10) || defaultSettings.maxExtraMessages,
+          autoRefreshEnabled: toggleAutoRefreshEl.checked,
+          autoRefreshAfter: parseInt(autoRefreshAfterEl.value, 10) || defaultSettings.autoRefreshAfter,
           debug: toggleDebugEl.checked,
           theme: themeModeEl.value
         };
@@ -134,8 +146,11 @@ document.addEventListener("DOMContentLoaded", () => {
     toggleEnabledEl.checked = settings.enabled;
     messageLimitEl.value = settings.messageLimit;
     maxExtraMessagesEl.value = settings.maxExtraMessages ?? 300;
+    toggleAutoRefreshEl.checked = settings.autoRefreshEnabled ?? false;
+    autoRefreshAfterEl.value = settings.autoRefreshAfter ?? 15;
     toggleDebugEl.checked = settings.debug;
     themeModeEl.value = settings.theme || "system";
+    updateAutoRefreshInputState();
     updateStatusText(settings.enabled);
     applyTheme(themeModeEl.value);
     syncIconThemePreference(themeModeEl.value);
@@ -162,6 +177,19 @@ document.addEventListener("DOMContentLoaded", () => {
     if (isNaN(value) || value < 0) value = 0;
     if (value > 1000) value = 1000;
     maxExtraMessagesEl.value = value;
+    saveSettings();
+  });
+
+  toggleAutoRefreshEl.addEventListener("change", () => {
+    updateAutoRefreshInputState();
+    saveSettings();
+  });
+
+  autoRefreshAfterEl.addEventListener("change", () => {
+    let value = parseInt(autoRefreshAfterEl.value, 10);
+    if (isNaN(value) || value < 1) value = 1;
+    if (value > 200) value = 200;
+    autoRefreshAfterEl.value = value;
     saveSettings();
   });
 

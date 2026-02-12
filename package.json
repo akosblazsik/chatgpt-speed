@@ -1,7 +1,7 @@
 {
   "name": "chatgpt-speed",
   "private": true,
-  "version": "1.0.15",
+  "version": "1.0.18",
   "description": "Tooling for ChatGPT Speed Chrome extension",
   "scripts": {
     "lint": "eslint \"src/**/*.js\"",

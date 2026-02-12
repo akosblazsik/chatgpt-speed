@@ -103,6 +103,8 @@ chrome.runtime.onInstalled.addListener((details) => {
         enabled: true,
         messageLimit: 15,
         maxExtraMessages: 300,
+        autoRefreshEnabled: false,
+        autoRefreshAfter: 15,
         debug: false
       }
     });

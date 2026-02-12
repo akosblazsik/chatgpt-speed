@@ -7,6 +7,7 @@ What it does:
 • Turn-aware limits: Keeps the last N turns (role changes), so multi-part replies stay intact.
 • Support node preservation: Keeps tool/image/attachment helper nodes tied to visible messages.
 • Popup dashboard: Total messages, rendered count, and memory saved (%).
+• Popup settings: Enable Speed, message limits, and auto-refresh preferences in one place.
 • Theme: System, light, or dark mode for the popup.
 • Local processing: All logic runs locally. No data leaves your browser.
 • Minimal permissions: Only runs on chat.openai.com and chatgpt.com.

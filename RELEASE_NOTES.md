@@ -1,5 +1,17 @@
 # Release Notes
 
+## v1.0.18 — Popup auto-refresh settings
+
+### ⚙️ Settings
+- Added `Auto-refresh` toggle to the popup settings.
+- Added `After (messages)` numeric setting with clamping and persistence.
+- Extended shared settings normalization/defaults so popup/content/page scripts keep a consistent settings shape.
+
+### 🧾 Documentation
+- Updated README settings docs and Chrome Web Store description copy to include auto-refresh preferences.
+
+---
+
 ## v1.0.17 — Header badges + shorter warning copy
 
 ### 🎨 UI

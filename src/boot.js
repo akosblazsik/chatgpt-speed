@@ -19,6 +19,8 @@
     enabled: true,
     messageLimit: 15,
     maxExtraMessages: 300,
+    autoRefreshEnabled: false,
+    autoRefreshAfter: 15,
     debug: false,
     theme: "system"
   };
@@ -33,6 +35,9 @@
             enabled: settings.enabled ?? defaultSettings.enabled,
             messageLimit: settings.messageLimit ?? defaultSettings.messageLimit,
             maxExtraMessages: settings.maxExtraMessages ?? defaultSettings.maxExtraMessages,
+            autoRefreshEnabled:
+              settings.autoRefreshEnabled ?? defaultSettings.autoRefreshEnabled,
+            autoRefreshAfter: settings.autoRefreshAfter ?? defaultSettings.autoRefreshAfter,
             debug: settings.debug ?? defaultSettings.debug,
             theme: settings.theme ?? defaultSettings.theme
           };

@@ -24,6 +24,8 @@
     enabled: true,
     messageLimit: 15,
     maxExtraMessages: 300,
+    autoRefreshEnabled: false,
+    autoRefreshAfter: 15,
     debug: false,
     theme: "system"
   });
@@ -267,6 +269,9 @@
           enabled: parsed.enabled ?? DEFAULT_CONFIG.enabled,
           messageLimit: Math.max(1, parsed.messageLimit ?? DEFAULT_CONFIG.messageLimit),
           maxExtraMessages: parsed.maxExtraMessages ?? DEFAULT_CONFIG.maxExtraMessages,
+          autoRefreshEnabled:
+            parsed.autoRefreshEnabled ?? DEFAULT_CONFIG.autoRefreshEnabled,
+          autoRefreshAfter: Math.max(1, parsed.autoRefreshAfter ?? DEFAULT_CONFIG.autoRefreshAfter),
           debug: parsed.debug ?? DEFAULT_CONFIG.debug,
           theme: parsed.theme ?? DEFAULT_CONFIG.theme
         };
