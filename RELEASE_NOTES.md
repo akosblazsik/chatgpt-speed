@@ -1,5 +1,17 @@
 # Release Notes
 
+## v1.0.20 — Remove max extra messages setting
+
+### ⚙️ Settings
+- Removed **Max Extra Messages** from the popup settings UI.
+- Removed the related `maxExtraMessages` config/state/storage paths from runtime scripts.
+- Loading older messages now increments based on current limit and session message growth without a separate max-extra cap.
+
+### 🧾 Documentation
+- Updated README and docs references to reflect the removed setting.
+
+---
+
 ## v1.0.19 — Auto-refresh and navigation bugfixes
 
 ### 🛠️ Fixes

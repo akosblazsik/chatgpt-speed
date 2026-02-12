@@ -9,7 +9,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const toggleEnabledEl = document.getElementById("toggleEnabled");
   const toggleDebugEl = document.getElementById("toggleDebug");
   const messageLimitEl = document.getElementById("messageLimit");
-  const maxExtraMessagesEl = document.getElementById("maxExtraMessages");
   const toggleAutoRefreshEl = document.getElementById("toggleAutoRefresh");
   const refreshBtn = document.getElementById("refreshBtn");
   const themeModeEl = document.getElementById("themeMode");
@@ -24,7 +23,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const defaultSettings = configApi?.DEFAULT_SETTINGS || {
     enabled: true,
     messageLimit: 15,
-    maxExtraMessages: 300,
     autoRefreshEnabled: false,
     debug: false,
     theme: "system"
@@ -86,7 +84,6 @@ document.addEventListener("DOMContentLoaded", () => {
       ? normalizeSettings({
           enabled: toggleEnabledEl.checked,
           messageLimit: messageLimitEl.value,
-          maxExtraMessages: maxExtraMessagesEl.value,
           autoRefreshEnabled: toggleAutoRefreshEl.checked,
           debug: toggleDebugEl.checked,
           theme: themeModeEl.value
@@ -94,7 +91,6 @@ document.addEventListener("DOMContentLoaded", () => {
       : {
           enabled: toggleEnabledEl.checked,
           messageLimit: parseInt(messageLimitEl.value, 10) || defaultSettings.messageLimit,
-          maxExtraMessages: parseInt(maxExtraMessagesEl.value, 10) || defaultSettings.maxExtraMessages,
           autoRefreshEnabled: toggleAutoRefreshEl.checked,
           debug: toggleDebugEl.checked,
           theme: themeModeEl.value
@@ -137,7 +133,6 @@ document.addEventListener("DOMContentLoaded", () => {
     debugEnabled = settings.debug;
     toggleEnabledEl.checked = settings.enabled;
     messageLimitEl.value = settings.messageLimit;
-    maxExtraMessagesEl.value = settings.maxExtraMessages ?? 300;
     toggleAutoRefreshEl.checked = settings.autoRefreshEnabled ?? false;
     toggleDebugEl.checked = settings.debug;
     themeModeEl.value = settings.theme || "system";
@@ -159,14 +154,6 @@ document.addEventListener("DOMContentLoaded", () => {
     if (isNaN(value) || value < 1) value = 1;
     if (value > 100) value = 100;
     messageLimitEl.value = value;
-    saveSettings();
-  });
-
-  maxExtraMessagesEl.addEventListener("change", () => {
-    let value = parseInt(maxExtraMessagesEl.value, 10);
-    if (isNaN(value) || value < 0) value = 0;
-    if (value > 1000) value = 1000;
-    maxExtraMessagesEl.value = value;
     saveSettings();
   });
 

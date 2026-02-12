@@ -4,7 +4,6 @@
   const DEFAULT_SETTINGS = Object.freeze({
     enabled: true,
     messageLimit: 15,
-    maxExtraMessages: 300,
     autoRefreshEnabled: false,
     debug: false,
     theme: "system"
@@ -26,12 +25,6 @@
         DEFAULT_SETTINGS.messageLimit,
         1,
         100
-      ),
-      maxExtraMessages: clampNumber(
-        input.maxExtraMessages,
-        DEFAULT_SETTINGS.maxExtraMessages,
-        0,
-        1000
       ),
       autoRefreshEnabled: input.autoRefreshEnabled ?? DEFAULT_SETTINGS.autoRefreshEnabled,
       debug: input.debug ?? DEFAULT_SETTINGS.debug,

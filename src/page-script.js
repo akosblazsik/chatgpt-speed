@@ -23,7 +23,6 @@
   const DEFAULT_CONFIG = (configApi?.DEFAULT_SETTINGS || {
     enabled: true,
     messageLimit: 15,
-    maxExtraMessages: 300,
     autoRefreshEnabled: false,
     debug: false,
     theme: "system"
@@ -267,7 +266,6 @@
         return {
           enabled: parsed.enabled ?? DEFAULT_CONFIG.enabled,
           messageLimit: Math.max(1, parsed.messageLimit ?? DEFAULT_CONFIG.messageLimit),
-          maxExtraMessages: parsed.maxExtraMessages ?? DEFAULT_CONFIG.maxExtraMessages,
           autoRefreshEnabled:
             parsed.autoRefreshEnabled ?? DEFAULT_CONFIG.autoRefreshEnabled,
           debug: parsed.debug ?? DEFAULT_CONFIG.debug,
@@ -639,7 +637,6 @@
           : {
               enabled: config.enabled ?? DEFAULT_CONFIG.enabled,
               messageLimit: Math.max(1, config.messageLimit ?? DEFAULT_CONFIG.messageLimit),
-              maxExtraMessages: config.maxExtraMessages ?? DEFAULT_CONFIG.maxExtraMessages,
               debug: config.debug ?? DEFAULT_CONFIG.debug,
               theme: config.theme ?? DEFAULT_CONFIG.theme
             };

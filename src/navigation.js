@@ -351,11 +351,6 @@
   function loadOlderMessages() {
     const limit = state.messageLimit || 10;
     const currentExtra = getExtraMessages();
-    let maxExtra = state.maxExtraMessages;
-    if (typeof maxExtra !== "number" || Number.isNaN(maxExtra)) {
-      maxExtra = Math.max(50, limit * 20);
-    }
-    maxExtra = Math.max(0, maxExtra);
     
     // Calculate new messages added during this session
     let newMessages = 0;
@@ -365,7 +360,7 @@
     
     // Increment extra messages by the limit PLUS any new messages that pushed old ones out
     // If user added 15 messages, we need to request 15 + 15 = 30 extra to see 15 old ones.
-    const newExtra = Math.min(currentExtra + limit + newMessages, maxExtra);
+    const newExtra = Math.max(0, currentExtra + limit + newMessages);
     
     log(`Loading ${limit} more older messages (total extra: ${newExtra})`);
     

@@ -26,7 +26,6 @@ window.ChatGPTSpeedBooster = window.ChatGPTSpeedBooster || {};
     enabled: defaultSettings.enabled ?? true,
     debug: defaultSettings.debug ?? false,
     messageLimit: defaultSettings.messageLimit ?? 15,
-    maxExtraMessages: defaultSettings.maxExtraMessages ?? 300,
     autoRefreshEnabled: defaultSettings.autoRefreshEnabled ?? false,
 
     /** Stats for popup display */

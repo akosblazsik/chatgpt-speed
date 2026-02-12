@@ -19,7 +19,6 @@
   const defaults = configApi?.DEFAULT_SETTINGS || {
     enabled: true,
     messageLimit: 15,
-    maxExtraMessages: 300,
     debug: false,
     theme: "system"
   };
@@ -36,7 +35,6 @@
         const config = normalizeSettings ? normalizeSettings(stored) : {
           enabled: stored.enabled ?? defaults.enabled,
           messageLimit: stored.messageLimit ?? defaults.messageLimit,
-          maxExtraMessages: stored.maxExtraMessages ?? defaults.maxExtraMessages,
           debug: stored.debug ?? defaults.debug,
           theme: stored.theme ?? defaults.theme
         };

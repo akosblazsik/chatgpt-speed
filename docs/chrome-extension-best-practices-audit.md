@@ -69,7 +69,7 @@ This audit compares the current repository implementation against common Chrome 
 
 **Observed pattern**
 - `page-inject.js` syncs only `{ enabled, messageLimit, debug }`.
-- Other scripts also depend on `maxExtraMessages`.
+- Other scripts may evolve to depend on additional settings fields over time.
 
 **Why this matters**
 - Inconsistent config mirrors can create surprising startup behavior depending on load order and stale localStorage values.
@@ -163,7 +163,7 @@ Implementation proposal:
 
 Expected effect:
 
-- Eliminates config drift (e.g., `maxExtraMessages` inconsistency) and startup edge cases.
+- Eliminates config drift across execution contexts and startup edge cases.
 - Makes future setting additions less error-prone.
 
 ### Point 4 — Document trust boundaries

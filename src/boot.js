@@ -18,7 +18,6 @@
   const defaultSettings = configApi?.DEFAULT_SETTINGS || {
     enabled: true,
     messageLimit: 15,
-    maxExtraMessages: 300,
     autoRefreshEnabled: false,
     debug: false,
     theme: "system"
@@ -33,7 +32,6 @@
         : {
             enabled: settings.enabled ?? defaultSettings.enabled,
             messageLimit: settings.messageLimit ?? defaultSettings.messageLimit,
-            maxExtraMessages: settings.maxExtraMessages ?? defaultSettings.maxExtraMessages,
             autoRefreshEnabled:
               settings.autoRefreshEnabled ?? defaultSettings.autoRefreshEnabled,
             debug: settings.debug ?? defaultSettings.debug,
@@ -62,7 +60,6 @@
       state.enabled = settings.enabled;
       state.debug = settings.debug;
       state.messageLimit = settings.messageLimit;
-      state.maxExtraMessages = settings.maxExtraMessages;
       state.autoRefreshEnabled = settings.autoRefreshEnabled;
 
       // Sync to localStorage for page-script
@@ -93,7 +90,6 @@
         state.enabled = settings.enabled;
         state.debug = settings.debug;
         state.messageLimit = settings.messageLimit;
-        state.maxExtraMessages = settings.maxExtraMessages;
         state.autoRefreshEnabled = settings.autoRefreshEnabled;
 
         // Sync to localStorage
