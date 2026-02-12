@@ -5,9 +5,10 @@ Privacy-first: Trimming happens locally in your browser. The extension does not 
 What it does:
 • Fetch-level trimming: Intercepts ChatGPT’s conversation JSON and trims it before React renders, reducing heavy payloads.
 • Turn-aware limits: Keeps the last N turns (role changes), so multi-part replies stay intact.
+• Load previous messages on demand: Adds a button to reveal older messages when you need more context.
 • Support node preservation: Keeps tool/image/attachment helper nodes tied to visible messages.
 • Popup dashboard: Total messages, rendered count, and memory saved (%).
-• Popup settings: Enable Speed, message limits, and auto-refresh preferences in one place.
+• Popup settings: Enable Speed, Messages to Show (1-100), Auto-refresh, theme, and debug mode.
 • Theme: System, light, or dark mode for the popup.
 • Local processing: All logic runs locally. No data leaves your browser.
 • Minimal permissions: Only runs on chat.openai.com and chatgpt.com.

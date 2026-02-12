@@ -1,5 +1,16 @@
 # Release Notes
 
+## v1.0.21 — Project chat URL support for load-previous button
+
+### 🛠️ Fixes
+- Fixed conversation ID parsing so `Load previous messages` works on project chat URLs like `/g/.../c/<conversation-id>`.
+- Preserved existing behavior for regular `/c/<conversation-id>` chats.
+
+### 🧾 Documentation
+- Updated Chrome Web Store description copy to reflect current settings and on-demand older message loading.
+
+---
+
 ## v1.0.20 — Remove max extra messages setting
 
 ### ⚙️ Settings

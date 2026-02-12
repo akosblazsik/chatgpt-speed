@@ -29,7 +29,7 @@
     if (!url || typeof url !== "string") return null;
     try {
       const parsed = new URL(url, window.location.origin);
-      const match = parsed.pathname.match(/^\/c\/([^/]+)/);
+      const match = parsed.pathname.match(/(?:^|\/)c\/([^/]+)/);
       return match ? match[1] : null;
     } catch {
       return null;
