@@ -86,8 +86,7 @@ Click the extension icon to access:
 - **Enable Speed:** Toggle optimization on/off.
 - **Messages to Show:** Set how many recent messages to keep visible (default: 15, range: 1–100).
 - **Max Extra Messages:** Cap how many older messages can be loaded beyond the base limit.
-- **Auto-refresh:** Toggle automatic refresh behavior for the active chat tab.
-- **After (messages):** Set how many new messages trigger auto-refresh planning (default: 15, range: 1-200).
+- **Auto-refresh:** Toggle automatic refresh when new messages reach your configured **Messages to Show** value.
 - **Debug Mode:** Enable detailed console logs for troubleshooting.
 - **Save Settings:** Refreshes the current ChatGPT tab after updating settings.
 

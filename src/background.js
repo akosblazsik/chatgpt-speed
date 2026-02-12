@@ -104,7 +104,6 @@ chrome.runtime.onInstalled.addListener((details) => {
         messageLimit: 15,
         maxExtraMessages: 300,
         autoRefreshEnabled: false,
-        autoRefreshAfter: 15,
         debug: false
       }
     });
@@ -138,6 +137,15 @@ chrome.runtime.onMessage.addListener((message, sender) => {
     const theme = message.theme;
     if (theme === "system" || theme === "light" || theme === "dark") {
       applyIconThemePreference(theme);
+    }
+  } else if (message.type === "csbAutoRefreshTab") {
+    const tabId = sender?.tab?.id;
+    if (Number.isInteger(tabId)) {
+      chrome.tabs.reload(tabId, () => {
+        if (chrome.runtime.lastError) {
+          console.warn("csb auto-refresh tabs.reload failed:", chrome.runtime.lastError.message);
+        }
+      });
     }
   }
 });

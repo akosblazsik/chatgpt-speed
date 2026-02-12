@@ -20,7 +20,6 @@
     messageLimit: 15,
     maxExtraMessages: 300,
     autoRefreshEnabled: false,
-    autoRefreshAfter: 15,
     debug: false,
     theme: "system"
   };
@@ -37,7 +36,6 @@
             maxExtraMessages: settings.maxExtraMessages ?? defaultSettings.maxExtraMessages,
             autoRefreshEnabled:
               settings.autoRefreshEnabled ?? defaultSettings.autoRefreshEnabled,
-            autoRefreshAfter: settings.autoRefreshAfter ?? defaultSettings.autoRefreshAfter,
             debug: settings.debug ?? defaultSettings.debug,
             theme: settings.theme ?? defaultSettings.theme
           };
@@ -65,6 +63,7 @@
       state.debug = settings.debug;
       state.messageLimit = settings.messageLimit;
       state.maxExtraMessages = settings.maxExtraMessages;
+      state.autoRefreshEnabled = settings.autoRefreshEnabled;
 
       // Sync to localStorage for page-script
       syncSettingsToLocalStorage(settings);
@@ -95,6 +94,7 @@
         state.debug = settings.debug;
         state.messageLimit = settings.messageLimit;
         state.maxExtraMessages = settings.maxExtraMessages;
+        state.autoRefreshEnabled = settings.autoRefreshEnabled;
 
         // Sync to localStorage
         syncSettingsToLocalStorage(settings);
@@ -234,6 +234,8 @@
   let checkScheduled = false;
   let pendingLastStatusTimer = null;
   let pendingLastStatusUrl = null;
+  let autoRefreshPending = false;
+  let waitForStreamEndTimer = null;
 
   /**
    * Count the number of visible message turns in the DOM.
@@ -299,10 +301,44 @@
 
     // Show warning when enough new messages have been added
     if (newMessages >= limit && !performanceWarningShown) {
-      performanceWarningShown = true;
-      log("Performance warning triggered!");
-      showPerformanceWarning({ turnsSinceRefresh: newMessages, limit: limit });
+      log("Performance warning threshold reached");
+      const triggered = showPerformanceWarning({
+        turnsSinceRefresh: newMessages,
+        limit
+      });
+      if (triggered) {
+        performanceWarningShown = true;
+      }
     }
+  }
+
+  function triggerAutoRefresh(detail) {
+    if (autoRefreshPending) return;
+    autoRefreshPending = true;
+    const turns = detail?.turnsSinceRefresh ?? "many";
+    log(`Auto-refresh triggered at ${turns} new messages (limit: ${state.messageLimit})`);
+    booster.activeBadge.markForRefresh();
+    setTimeout(() => {
+      chrome.runtime.sendMessage({ type: "csbAutoRefreshTab" }, () => {
+        if (!chrome.runtime.lastError) return;
+        log("Background auto-refresh failed; falling back to location.reload()");
+        window.location.reload();
+      });
+    }, 250);
+  }
+
+  function isResponseStreaming() {
+    return Boolean(
+      document.querySelector('[data-testid="stop-button"]') ||
+      document.querySelector('[data-testid="composer-stop-button"]') ||
+      document.querySelector('button[aria-label*="Stop"]')
+    );
+  }
+
+  function clearStreamWaitTimer() {
+    if (!waitForStreamEndTimer) return;
+    clearInterval(waitForStreamEndTimer);
+    waitForStreamEndTimer = null;
   }
 
   /**
@@ -418,6 +454,7 @@
       clearTimeout(pendingLastStatusTimer);
       pendingLastStatusTimer = null;
     }
+    clearStreamWaitTimer();
     pendingLastStatusUrl = null;
     log("Message watcher state reset");
   }
@@ -428,9 +465,34 @@
    * Show a performance warning badge when many new messages are added.
    */
   function showPerformanceWarning(detail) {
+    if (isResponseStreaming()) {
+      if (!waitForStreamEndTimer) {
+        let checks = 0;
+        waitForStreamEndTimer = setInterval(() => {
+          checks += 1;
+          if (checks > 60) {
+            clearStreamWaitTimer();
+            return;
+          }
+          if (isResponseStreaming()) return;
+          clearStreamWaitTimer();
+          const triggered = showPerformanceWarning(detail);
+          if (triggered) {
+            performanceWarningShown = true;
+          }
+        }, 500);
+      }
+      return false;
+    }
+
+    if (state.autoRefreshEnabled) {
+      triggerAutoRefresh(detail);
+      return true;
+    }
+
     // Create and show a warning badge
     const existingBadge = document.getElementById("csb-performance-warning-badge");
-    if (existingBadge) return; // Already showing
+    if (existingBadge) return true; // Already showing
     
     const badge = document.createElement("div");
     badge.id = "csb-performance-warning-badge";
@@ -547,6 +609,7 @@
     
     // Auto-dismiss after 7 seconds
     setTimeout(dismissBadge, 7000);
+    return true;
   }
 
   // ---- Shameless self promotion -----------------------------------------
@@ -595,9 +658,13 @@
         if (booster.navigation && booster.navigation.clearExtraMessages) {
           booster.navigation.clearExtraMessages();
         }
+        if (booster.navigation && booster.navigation.resetForConversationChange) {
+          booster.navigation.resetForConversationChange();
+        }
         
         // Clear navigation handshake flags
         try {
+          sessionStorage.removeItem("csb_last_status");
           sessionStorage.removeItem("csb_navigating");
           sessionStorage.removeItem("csb_ack");
         } catch(e) {}
@@ -724,6 +791,7 @@
     if (checkDebounceTimer) {
       clearTimeout(checkDebounceTimer);
     }
+    clearStreamWaitTimer();
   });
 
   // Initialize when ready

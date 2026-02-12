@@ -6,7 +6,6 @@
     messageLimit: 15,
     maxExtraMessages: 300,
     autoRefreshEnabled: false,
-    autoRefreshAfter: 15,
     debug: false,
     theme: "system"
   });
@@ -35,12 +34,6 @@
         1000
       ),
       autoRefreshEnabled: input.autoRefreshEnabled ?? DEFAULT_SETTINGS.autoRefreshEnabled,
-      autoRefreshAfter: clampNumber(
-        input.autoRefreshAfter,
-        DEFAULT_SETTINGS.autoRefreshAfter,
-        1,
-        200
-      ),
       debug: input.debug ?? DEFAULT_SETTINGS.debug,
       theme: ["system", "light", "dark"].includes(input.theme)
         ? input.theme

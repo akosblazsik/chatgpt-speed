@@ -25,6 +25,17 @@
   let themeMediaQuery = null;
   let themeMediaHandler = null;
 
+  function getConversationIdFromUrl(url) {
+    if (!url || typeof url !== "string") return null;
+    try {
+      const parsed = new URL(url, window.location.origin);
+      const match = parsed.pathname.match(/^\/c\/([^/]+)/);
+      return match ? match[1] : null;
+    } catch {
+      return null;
+    }
+  }
+
   // ---- State Management ----
 
   function checkNavigationFlag() {
@@ -502,6 +513,11 @@
     }
   }
 
+  function resetForConversationChange() {
+    hasOlderMessages = false;
+    removeButton();
+  }
+
   // ---- Theme Handling ----
 
   function getThemeMode() {
@@ -592,8 +608,49 @@
     log("handleStatusUpdate received:", JSON.stringify(status));
     
     if (!status) return;
+    if (status.url && status.url !== window.location.href) return;
+
+    const currentConversationId = getConversationIdFromUrl(window.location.href);
+    const statusConversationId = status.conversationId || null;
+
+    // Never show "load previous" before a concrete conversation route exists.
+    if (!currentConversationId && status.hasOlderMessages) {
+      hasOlderMessages = false;
+      removeButton();
+      return;
+    }
+
+    if (currentConversationId && statusConversationId && statusConversationId !== currentConversationId) {
+      return;
+    }
 
     hasOlderMessages = status.hasOlderMessages ?? false;
+
+    const extraMessages = Number.isFinite(status.extraMessages) ? status.extraMessages : 0;
+    const configuredLimit = Number.isFinite(state.messageLimit) ? state.messageLimit : 15;
+    const effectiveLimit = Math.max(1, configuredLimit + Math.max(0, extraMessages));
+
+    // Hard guard: only show the button when there are truly more visible turns
+    // than the currently allowed window (limit + already loaded extras).
+    if (
+      hasOlderMessages &&
+      Number.isFinite(status.totalMessages) &&
+      status.totalMessages <= effectiveLimit
+    ) {
+      hasOlderMessages = false;
+    }
+
+    // Avoid showing the button while the assistant is still streaming.
+    if (
+      hasOlderMessages &&
+      (
+        document.querySelector('[data-testid="stop-button"]') ||
+        document.querySelector('[data-testid="composer-stop-button"]') ||
+        document.querySelector('button[aria-label*="Stop"]')
+      )
+    ) {
+      hasOlderMessages = false;
+    }
     
     // Safety check: Don't show button if total messages are less than or equal to rendered messages
     // This prevents "Load Older" button from appearing on new short chats due to race conditions or flags
@@ -693,8 +750,13 @@
       const storedStatus = sessionStorage.getItem("csb_last_status");
       if (storedStatus) {
         const status = JSON.parse(storedStatus);
-        log("Found stored status from before init:", status);
-        handleStatusUpdate(status);
+        if (status && status.url === window.location.href) {
+          log("Found stored status from before init:", status);
+          handleStatusUpdate(status);
+        } else {
+          sessionStorage.removeItem("csb_last_status");
+          log("Ignored stale stored status for different URL");
+        }
       }
     } catch (e) {
       // sessionStorage might not be available
@@ -730,7 +792,8 @@
     loadOlder: loadOlderMessages,
     clearExtraMessages,
     getExtraMessages,
-    updateButtonText
+    updateButtonText,
+    resetForConversationChange
   };
 
   // Auto-initialize

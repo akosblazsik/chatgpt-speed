@@ -1,6 +1,11 @@
-/target
+.ai/
+.agents/
+.codex/
+.key/
+.vscode/
+/assets/other/
 /keys
-main-v*.rs
-/.key/
-/assets/source-icons/
 /node_modules/
+/target
+/tools
+main-v*.rs

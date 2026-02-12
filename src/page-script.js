@@ -25,7 +25,6 @@
     messageLimit: 15,
     maxExtraMessages: 300,
     autoRefreshEnabled: false,
-    autoRefreshAfter: 15,
     debug: false,
     theme: "system"
   });
@@ -271,7 +270,6 @@
           maxExtraMessages: parsed.maxExtraMessages ?? DEFAULT_CONFIG.maxExtraMessages,
           autoRefreshEnabled:
             parsed.autoRefreshEnabled ?? DEFAULT_CONFIG.autoRefreshEnabled,
-          autoRefreshAfter: Math.max(1, parsed.autoRefreshAfter ?? DEFAULT_CONFIG.autoRefreshAfter),
           debug: parsed.debug ?? DEFAULT_CONFIG.debug,
           theme: parsed.theme ?? DEFAULT_CONFIG.theme
         };
@@ -331,25 +329,31 @@
   let lastStatusWrite = 0;
 
   function dispatchStatus(status) {
+    const statusWithUrl = {
+      ...status,
+      url: window.location.href
+    };
+
     if (lastDispatchedStatus) {
       const same =
-        lastDispatchedStatus.totalMessages === status.totalMessages &&
-        lastDispatchedStatus.renderedMessages === status.renderedMessages &&
-        lastDispatchedStatus.extraMessages === status.extraMessages &&
-        lastDispatchedStatus.hasOlderMessages === status.hasOlderMessages &&
-        lastDispatchedStatus.url === status.url;
+        lastDispatchedStatus.totalMessages === statusWithUrl.totalMessages &&
+        lastDispatchedStatus.renderedMessages === statusWithUrl.renderedMessages &&
+        lastDispatchedStatus.extraMessages === statusWithUrl.extraMessages &&
+        lastDispatchedStatus.hasOlderMessages === statusWithUrl.hasOlderMessages &&
+        lastDispatchedStatus.conversationId === statusWithUrl.conversationId &&
+        lastDispatchedStatus.url === statusWithUrl.url;
       if (same) {
         return;
       }
     }
-    lastDispatchedStatus = status;
+    lastDispatchedStatus = statusWithUrl;
 
     // Use postMessage to communicate with content script (across context boundary)
     window.postMessage({
       __csb: true,
       channel: MESSAGE_CHANNEL,
       type: "csb-status",
-      payload: status
+      payload: statusWithUrl
     }, window.location.origin);
     
     // Also persist to sessionStorage as backup for timing issues
@@ -357,8 +361,7 @@
       const now = Date.now();
       if (now - lastStatusWrite > 2000) {
         sessionStorage.setItem("csb_last_status", JSON.stringify({
-          ...status,
-          url: window.location.href
+          ...statusWithUrl
         }));
         lastStatusWrite = now;
       }
@@ -546,7 +549,8 @@
           totalMessages: trimmed.visibleTotal,
           renderedMessages: trimmed.visibleKept,
           extraMessages: extraMessages,
-          hasOlderMessages: false
+          hasOlderMessages: false,
+          conversationId: json.conversation_id || currentConversationId || null
         });
         return res;
       }
@@ -565,7 +569,8 @@
         totalMessages: totalBefore,
         renderedMessages: keptAfter,
         extraMessages: extraMessages,
-        hasOlderMessages: trimmed.hasOlderMessages
+        hasOlderMessages: trimmed.hasOlderMessages,
+        conversationId: json.conversation_id || currentConversationId || null
       });
 
       const modifiedData = {

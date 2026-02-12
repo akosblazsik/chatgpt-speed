@@ -1,10 +1,21 @@
 # Release Notes
 
+## v1.0.19 — Auto-refresh and navigation bugfixes
+
+### 🛠️ Fixes
+- Fixed premature `Load previous messages` button visibility on new or switching chats.
+- Added stronger status guards using URL/conversation identity to prevent stale state bleed between chats.
+- Reset navigation state and stale session status on conversation changes.
+- Deferred auto-refresh while ChatGPT is actively streaming, then trigger safely after generation settles.
+- Switched auto-refresh to background tab reload messaging as primary path for better runtime stability.
+
+---
+
 ## v1.0.18 — Popup auto-refresh settings
 
 ### ⚙️ Settings
 - Added `Auto-refresh` toggle to the popup settings.
-- Added `After (messages)` numeric setting with clamping and persistence.
+- Auto-refresh now uses the existing `Messages to Show` threshold.
 - Extended shared settings normalization/defaults so popup/content/page scripts keep a consistent settings shape.
 
 ### 🧾 Documentation
